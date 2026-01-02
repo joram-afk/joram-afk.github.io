@@ -10,11 +10,22 @@
     h2 { color: var(--primary); margin-bottom: 20px; text-align: center; }
     .section { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
     label { font-size: 0.8rem; color: #aab4d4; display: block; margin-bottom: 5px; }
-    input, select { width: 100%; padding: 10px; background: #0b0e1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; margin-bottom: 10px; }
+    input { width: 100%; padding: 10px; background: #0b0e1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; margin-bottom: 10px; }
+    
     .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 5px; }
     .save-btn { background: var(--primary); color: #0b0e1a; }
     .back-btn { background: transparent; color: #aab4d4; border: 1px solid #aab4d4; margin-top: 15px; }
-    .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    
+    /* Delete List Styles */
+    .link-item { 
+      display: flex; justify-content: space-between; align-items: center; 
+      padding: 10px; background: rgba(0,0,0,0.3); margin-bottom: 5px; border-radius: 5px;
+    }
+    .del-btn { 
+      background: #ff4757; color: white; border: none; padding: 5px 10px; 
+      border-radius: 5px; cursor: pointer; font-size: 0.7rem;
+    }
+    .del-btn:hover { background: #ff6b81; }
   </style>
 </head>
 <body>
@@ -23,19 +34,23 @@
 
     <div class="section">
       <label>SYSTEM THEME</label>
-      <div class="theme-grid">
-        <button class="btn" style="background:#6c9cff; color:black" onclick="setTheme('default')">Cyber Blue</button>
-        <button class="btn" style="background:#2ed573; color:black" onclick="setTheme('hacker')">Matrix Green</button>
-        <button class="btn" style="background:#ff4757; color:black" onclick="setTheme('lava')">Lava Red</button>
-        <button class="btn" style="background:#ff00ff; color:black" onclick="setTheme('neon')">Vaporwave</button>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <button class="btn" style="background:#6c9cff;" onclick="setTheme('default')">Blue</button>
+        <button class="btn" style="background:#2ed573;" onclick="setTheme('hacker')">Green</button>
       </div>
     </div>
 
     <div class="section">
       <label>ADD CUSTOM LINK</label>
-      <input type="text" id="linkName" placeholder="Site Name (e.g. Discord)">
-      <input type="text" id="linkUrl" placeholder="URL (https://...)">
-      <button class="save-btn btn" onclick="addLink()">➕ ADD TO DASHBOARD</button>
+      <input type="text" id="linkName" placeholder="Site Name">
+      <input type="text" id="linkUrl" placeholder="https://...">
+      <button class="save-btn btn" onclick="addLink()">➕ ADD LINK</button>
+    </div>
+
+    <div class="section">
+      <label>MANAGE LINKS</label>
+      <div id="deleteList">
+        </div>
     </div>
 
     <button class="back-btn btn" onclick="location.href='gemini.html'">RETURN TO HUB</button>
@@ -44,7 +59,25 @@
   <script>
     function setTheme(theme) {
       localStorage.setItem('hubTheme', theme);
-      alert('Theme set to ' + theme + '! Refreshing Hub...');
+      alert('Theme Updated!');
+    }
+
+    // Function to show the list of links with Delete buttons
+    function renderDeleteList() {
+      const listDiv = document.getElementById('deleteList');
+      const links = JSON.parse(localStorage.getItem('customLinks') || '[]');
+      
+      if (links.length === 0) {
+        listDiv.innerHTML = '<p style="font-size:0.8rem; color:gray;">No custom links found.</p>';
+        return;
+      }
+
+      listDiv.innerHTML = links.map((link, index) => `
+        <div class="link-item">
+          <span>${link.name}</span>
+          <button class="del-btn" onclick="deleteLink(${index})">DELETE</button>
+        </div>
+      `).join('');
     }
 
     function addLink() {
@@ -54,11 +87,21 @@
         let links = JSON.parse(localStorage.getItem('customLinks') || '[]');
         links.push({name, url});
         localStorage.setItem('customLinks', JSON.stringify(links));
-        alert('Link added!');
         document.getElementById('linkName').value = '';
         document.getElementById('linkUrl').value = '';
+        renderDeleteList(); // Refresh the list
       }
     }
+
+    function deleteLink(index) {
+      let links = JSON.parse(localStorage.getItem('customLinks') || '[]');
+      links.splice(index, 1); // Remove the item at that position
+      localStorage.setItem('customLinks', JSON.stringify(links));
+      renderDeleteList(); // Refresh the list
+    }
+
+    // Load the list when the page opens
+    renderDeleteList();
   </script>
 </body>
 </html>
