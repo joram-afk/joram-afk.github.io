@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>JOE HUB - Dashboard</title>
+  <title>JOE HUB - Smart Dashboard</title>
   <style>
-    /* Dynamic Variables - Controlled by the Theme Engine */
     :root { 
       --primary: #6c9cff; 
       --bg: #0f1220; 
@@ -23,28 +22,17 @@
       flex-direction: column; 
       align-items: center; 
       padding: 20px;
-      transition: background 0.5s ease; /* Smooth color transitions */
+      transition: background 0.5s ease;
     }
 
-    /* Admin Gear Icon */
+    /* Admin Gear */
     #adminBtn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: var(--card-bg);
-      border: 1px solid var(--primary);
-      color: var(--primary);
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: none; 
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      cursor: pointer;
-      transition: 0.3s;
-      box-shadow: 0 0 10px rgba(108, 156, 255, 0.2);
-      z-index: 1000;
+      position: fixed; top: 20px; right: 20px;
+      background: var(--card-bg); border: 1px solid var(--primary);
+      color: var(--primary); width: 50px; height: 50px; border-radius: 50%;
+      display: none; align-items: center; justify-content: center;
+      font-size: 1.5rem; cursor: pointer; transition: 0.3s;
+      box-shadow: 0 0 10px rgba(108, 156, 255, 0.2); z-index: 1000;
     }
     #adminBtn:hover { transform: rotate(90deg); background: var(--primary); color: var(--bg); }
 
@@ -54,30 +42,18 @@
     #clock { font-size: 2.5rem; font-weight: bold; }
     
     .dashboard-grid { 
-      display: grid; 
-      grid-template-columns: repeat(3, 1fr); 
-      gap: 20px; 
-      width: 100%; 
-      max-width: 900px; 
-      margin-bottom: 40px; 
+      display: grid; grid-template-columns: repeat(3, 1fr); 
+      gap: 20px; width: 100%; max-width: 900px; margin-bottom: 40px; 
     }
 
     .nav-card { 
-      background: var(--card-bg); 
-      border: 1px solid rgba(255,255,255,0.1); 
-      border-radius: 15px; 
-      padding: 25px; 
-      text-decoration: none; 
-      color: white; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      gap: 10px; 
-      transition: 0.3s; 
+      background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); 
+      border-radius: 15px; padding: 25px; text-decoration: none; color: white; 
+      display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.3s; 
     }
     .nav-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    .nav-card span { font-size: 2rem; }
 
-    /* Sticky Note Area */
     .sticky-note { width: 100%; max-width: 900px; background: var(--primary); padding: 20px; border-radius: 15px; margin-bottom: 40px; color: #000; }
     textarea { width: 100%; background: rgba(255,255,255,0.2); border: none; border-radius: 8px; padding: 10px; color: #000; resize: none; outline: none; margin-top: 10px; font-weight: bold;}
     
@@ -137,7 +113,20 @@
       document.documentElement.style.setProperty('--card-bg', config.card);
     }
 
-    // --- 2. DYNAMIC LINK LOADER ---
+    // --- 2. SMART ICON ENGINE ---
+    function getSmartIcon(name) {
+      const n = name.toLowerCase();
+      if (n.includes('amazon') || n.includes('shop') || n.includes('buy')) return '🛍️';
+      if (n.includes('discord')) return '💬';
+      if (n.includes('game') || n.includes('roblox')) return '🎮';
+      if (n.includes('music') || n.includes('spotify')) return '🎵';
+      if (n.includes('netflix') || n.includes('watch') || n.includes('movie')) return '📺';
+      if (n.includes('github') || n.includes('code')) return '💻';
+      if (n.includes('google') || n.includes('search')) return '🔍';
+      if (n.includes('social') || n.includes('insta') || n.includes('face')) return '📱';
+      return '🌐'; // Default globe
+    }
+
     function loadCustomLinks() {
       const customLinks = JSON.parse(localStorage.getItem('customLinks') || '[]');
       const grid = document.getElementById('mainGrid');
@@ -146,12 +135,13 @@
         a.href = link.url;
         a.target = "_blank";
         a.className = "nav-card";
-        a.innerHTML = `<span>🔗</span><b>${link.name}</b>`;
+        const icon = getSmartIcon(link.name);
+        a.innerHTML = `<span>${icon}</span><b>${link.name}</b>`;
         grid.appendChild(a);
       });
     }
 
-    // --- 3. CLOCK & INITIALIZATION ---
+    // --- 3. INIT ---
     function updateClock() { 
       document.getElementById('clock').textContent = new Date().toLocaleTimeString(); 
     }
@@ -159,20 +149,13 @@
     document.addEventListener('DOMContentLoaded', () => {
       applyTheme();
       loadCustomLinks();
-      setInterval(updateClock, 1000); 
-      updateClock();
-
-      // User Data
+      setInterval(updateClock, 1000); updateClock();
       document.getElementById('userName').textContent = localStorage.getItem('storedUsername') || 'Guest';
       const status = localStorage.getItem('userStatus');
       if(status) document.getElementById('statusDisplay').textContent = `"${status}"`;
-
-      // Security Check for Admin Gear
       if(localStorage.getItem('userRole') === 'admin') {
         document.getElementById('adminBtn').style.display = 'flex';
       }
-
-      // Sticky Notes Logic
       const note = document.getElementById('noteArea');
       note.value = localStorage.getItem('userNote') || '';
       note.addEventListener('input', () => localStorage.setItem('userNote', note.value));
