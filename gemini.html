@@ -133,10 +133,22 @@
       });
     });
 
-    function performSearch() {
-      const q = document.getElementById('searchInput').value;
-      if(q) window.open('https://www.google.com/search?q=' + q, '_blank');
-    }
-  </script>
+   function performSearch() {
+  let q = document.getElementById('searchInput').value;
+  if (!q) return;
+
+  // If it's a website (contains a dot like .com) and lacks https
+  if (q.includes('.') && !q.startsWith('http')) {
+    q = 'https://' + q;
+  }
+
+  // If it's just a word, search Google. If it's a URL, go to the site.
+  if (q.startsWith('http')) {
+    window.open(q, '_blank');
+  } else {
+    window.open('https://www.google.com/search?q=' + q, '_blank');
+  }
+}
 </body>
 </html>
+
