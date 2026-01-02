@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel - JOE HUB</title>
+  <style>
+    :root { --primary: #6c9cff; --bg: #0b0e1a; --card: #161b33; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .admin-card { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--primary); width: 100%; max-width: 400px; text-align: center; }
+    .status-indicator { display: inline-block; width: 12px; height: 12px; background: #2ed573; border-radius: 50%; margin-right: 10px; box-shadow: 0 0 10px #2ed573; }
+    .control-group { margin: 20px 0; text-align: left; }
+    label { font-size: 0.8rem; color: #aab4d4; }
+    input { width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; margin-top: 5px; }
+    .btn { width: 100%; padding: 12px; margin-top: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+    .save-btn { background: var(--primary); color: #0b0e1a; }
+    .back-btn { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+  </style>
+</head>
+<body>
+  <div class="admin-card">
+    <h2>⚙️ SYSTEM CONTROL</h2>
+    <p style="margin: 10px 0;"><span class="status-indicator"></span>SYSTEM ONLINE</p>
+    <hr style="opacity: 0.1; margin: 20px 0;">
+    
+    <div class="control-group">
+      <label>Override Username</label>
+      <input type="text" id="newUsername" placeholder="Enter new name...">
+    </div>
+
+    <button class="save-btn btn" onclick="saveSettings()">APPLY CHANGES</button>
+    <button class="back-btn btn" onclick="location.href='gemini.html'">RETURN TO HUB</button>
+  </div>
+
+  <script>
+    function saveSettings() {
+      const name = document.getElementById('newUsername').value;
+      if(name) {
+        localStorage.setItem('storedUsername', name);
+        alert('System Profile Updated!');
+        location.href = 'gemini.html';
+      }
+    }
+  </script>
+</body>
+</html>
