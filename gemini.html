@@ -4,29 +4,21 @@
   <meta charset="UTF-8">
   <title>JOE HUB - Ultimate</title>
   <style>
-    /* --- THEME VARIABLES --- */
-    :root { 
-      --primary: #6c9cff; 
-      --bg: #0f1220; 
-      --card-bg: #1a1f35; 
-      --text: #eaeefc; 
-    }
-
+    :root { --primary: #6c9cff; --bg: #0f1220; --card-bg: rgba(26, 31, 53, 0.9); --text: #eaeefc; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     body { 
       font-family: 'Segoe UI', sans-serif; 
       background: var(--bg); 
+      background-size: cover; 
+      background-attachment: fixed; 
+      background-position: center;
       color: var(--text); 
       min-height: 100vh; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      padding: 20px;
-      transition: all 0.5s ease;
+      display: flex; flex-direction: column; align-items: center; padding: 20px;
+      transition: background 0.5s ease;
     }
 
-    /* --- ADMIN GEAR --- */
     #adminBtn {
       position: fixed; top: 20px; right: 20px;
       background: var(--card-bg); border: 1px solid var(--primary);
@@ -34,40 +26,19 @@
       display: none; align-items: center; justify-content: center;
       font-size: 1.5rem; cursor: pointer; transition: 0.3s; z-index: 1000;
     }
-    #adminBtn:hover { transform: rotate(90deg); background: var(--primary); color: var(--bg); }
+    #adminBtn:hover { transform: rotate(90deg); border-color: white; color: white; }
 
-    /* --- HEADER & WEATHER --- */
-    .header-container { text-align: center; margin-bottom: 20px; width: 100%; max-width: 900px; position: relative; }
-    .brand { font-size: 3rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 4px; }
+    .header-container { text-align: center; margin-bottom: 20px; width: 100%; max-width: 900px; }
+    .brand { font-size: 3rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 4px; text-shadow: 0 0 15px rgba(0,0,0,0.5); }
     
-    .weather-widget {
-      position: absolute; top: 0; left: 0;
-      background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 10px;
-      display: flex; align-items: center; gap: 10px; font-size: 0.9rem;
-    }
-    @media(max-width: 600px) { .weather-widget { position: relative; margin-bottom: 10px; display: inline-flex; } }
-
-    /* --- SUPER SEARCH BAR --- */
     .search-box {
       display: flex; gap: 10px; background: var(--card-bg); padding: 10px;
       border-radius: 50px; border: 1px solid rgba(255,255,255,0.1);
-      width: 100%; max-width: 600px; margin-bottom: 30px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      width: 100%; max-width: 600px; margin-bottom: 30px; backdrop-filter: blur(10px);
     }
-    .search-select { background: transparent; color: var(--primary); border: none; font-weight: bold; padding-left: 10px; cursor: pointer; outline: none;}
-    .search-input { flex: 1; background: transparent; border: none; color: white; font-size: 1.1rem; outline: none; }
-    .search-btn { background: var(--primary); color: var(--bg); border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; }
+    .search-input { flex: 1; background: transparent; border: none; color: white; font-size: 1.1rem; outline: none; padding-left: 15px; }
+    .search-btn { background: var(--primary); color: #000; border: none; padding: 10px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; }
 
-    /* --- WIDGET ROW (Timer & Clock) --- */
-    .widget-row { display: flex; gap: 20px; margin-bottom: 30px; width: 100%; max-width: 900px; justify-content: center; flex-wrap: wrap;}
-    
-    .widget-card { background: var(--card-bg); padding: 15px 25px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); text-align: center; min-width: 200px; }
-    .clock-time { font-size: 2rem; font-weight: bold; }
-    .timer-display { font-size: 2rem; font-family: monospace; color: var(--primary); }
-    .timer-controls button { background: rgba(255,255,255,0.1); border: none; color: white; padding: 5px 10px; margin: 5px; border-radius: 5px; cursor: pointer; }
-    .timer-controls button:hover { background: var(--primary); color: black; }
-
-    /* --- LINK GRID --- */
     .dashboard-grid { 
       display: grid; grid-template-columns: repeat(3, 1fr); 
       gap: 20px; width: 100%; max-width: 900px; margin-bottom: 40px; 
@@ -75,17 +46,16 @@
     .nav-card { 
       background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); 
       border-radius: 15px; padding: 25px; text-decoration: none; color: white; 
-      display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.3s; 
+      display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.3s; backdrop-filter: blur(5px);
     }
-    .nav-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    .nav-card:hover { transform: translateY(-5px); border-color: var(--primary); background: rgba(108, 156, 255, 0.2); }
     .nav-card span { font-size: 2rem; }
 
-    /* --- NOTES --- */
-    .sticky-note { width: 100%; max-width: 900px; background: var(--primary); padding: 20px; border-radius: 15px; margin-bottom: 40px; color: #000; }
+    .sticky-note { width: 100%; max-width: 900px; background: var(--primary); padding: 20px; border-radius: 15px; margin-bottom: 40px; color: #000; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
     textarea { width: 100%; background: rgba(255,255,255,0.2); border: none; border-radius: 8px; padding: 10px; color: #000; resize: none; outline: none; margin-top: 10px; font-weight: bold;}
 
     footer { display: flex; gap: 15px; margin-top: auto; padding-bottom: 20px; }
-    .btn { padding: 10px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; border: none; transition: 0.3s; }
+    .btn { padding: 12px 30px; border-radius: 8px; cursor: pointer; font-weight: bold; border: none; transition: 0.3s; }
     .back-btn { background: var(--card-bg); color: var(--primary); border: 1px solid var(--primary); }
     .quit-btn { background: #442b2b; color: #ff6c6c; border: 1px solid #ff6c6c; }
 
@@ -94,189 +64,79 @@
 </head>
 <body>
 
-  <div id="adminBtn" title="Admin Settings" onclick="location.href='admin.html'">⚙️</div>
+  <div id="adminBtn" onclick="location.href='admin.html'">⚙️</div>
 
   <div class="header-container">
-    <div class="weather-widget" id="weatherBox">
-      <span>☁️</span> <span id="weatherText">Loading Weather...</span>
-    </div>
     <h1 class="brand">JOE HUB</h1>
-    <p>Operator: <span id="userName" style="color:var(--primary); font-weight:bold;">User</span></p>
+    <p>Operator: <span id="userName">User</span></p>
   </div>
 
   <div class="search-box">
-    <select class="search-select" id="searchEngine">
-      <option value="google">Google</option>
-      <option value="youtube">YouTube</option>
-      <option value="wiki">Wikipedia</option>
-    </select>
-    <input type="text" class="search-input" id="searchInput" placeholder="Search the web...">
-    <button class="search-btn" onclick="performSearch()">GO</button>
-  </div>
-
-  <div class="widget-row">
-    <div class="widget-card">
-      <div class="clock-time" id="clock">00:00</div>
-      <div style="font-size:0.8rem; opacity:0.7;" id="dateDisplay">Date</div>
-    </div>
-    
-    <div class="widget-card">
-      <div style="font-size:0.8rem; opacity:0.7;">FOCUS TIMER</div>
-      <div class="timer-display" id="timerDisplay">25:00</div>
-      <div class="timer-controls">
-        <button onclick="startTimer()">▶</button>
-        <button onclick="pauseTimer()">⏸</button>
-        <button onclick="resetTimer()">↺</button>
-      </div>
-    </div>
+    <input type="text" class="search-input" id="searchInput" placeholder="Search Google...">
+    <button class="search-btn" onclick="performSearch()">SEARCH</button>
   </div>
 
   <div class="dashboard-grid" id="mainGrid">
-    <a href="https://www.espn.com" target="_blank" class="nav-card"><span>⚽</span><b>Sports</b></a>
+    <a href="https://www.youtube.com" target="_blank" class="nav-card"><span>🎬</span><b>YouTube</b></a>
     <a href="https://poki.com" target="_blank" class="nav-card"><span>🎮</span><b>Games</b></a>
-    <a href="https://www.youtube.com" target="_blank" class="nav-card"><span>🎬</span><b>Videos</b></a>
-    <a href="https://www.imdb.com" target="_blank" class="nav-card"><span>📽️</span><b>Movies</b></a>
+    <a href="https://www.google.com" target="_blank" class="nav-card"><span>🔍</span><b>Google</b></a>
   </div>
 
   <div class="sticky-note">
-    <strong>📌 System Notes:</strong>
-    <textarea id="noteArea" rows="3" placeholder="Type notes here..."></textarea>
+    <strong>📌 SYSTEM NOTES</strong>
+    <textarea id="noteArea" rows="3"></textarea>
   </div>
 
   <footer>
-    <button class="btn back-btn" onclick="location.href='candy.html'">⬅️ BACK</button>
-    <button class="btn quit-btn" onclick="localStorage.clear(); window.location.href='index.html'">🚪 QUIT</button>
+    <button class="btn back-btn" onclick="location.href='candy.html'">BACK</button>
+    <button class="btn quit-btn" onclick="localStorage.clear(); location.href='index.html'">LOGOUT</button>
   </footer>
 
   <script>
-    // --- 1. THEME ENGINE ---
-    const themes = {
-      hacker: { primary: '#2ed573', bg: '#001a00', card: '#002600' },
-      lava: { primary: '#ff4757', bg: '#1a0505', card: '#2d0a0a' },
-      neon: { primary: '#ff00ff', bg: '#120012', card: '#240024' },
-      default: { primary: '#6c9cff', bg: '#0f1220', card: '#1a1f35' }
-    };
-
-    function applyTheme() {
-      const savedTheme = localStorage.getItem('hubTheme') || 'default';
-      const config = themes[savedTheme];
-      document.documentElement.style.setProperty('--primary', config.primary);
-      document.documentElement.style.setProperty('--bg', config.bg);
-      document.documentElement.style.setProperty('--card-bg', config.card);
+    // --- SOUND ENGINE ---
+    function playSfx(freq) {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.1);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + 0.1);
     }
 
-    // --- 2. SEARCH ENGINE ---
-    function performSearch() {
-      const query = document.getElementById('searchInput').value;
-      const engine = document.getElementById('searchEngine').value;
-      if(!query) return;
-
-      let url = '';
-      if(engine === 'google') url = 'https://www.google.com/search?q=' + query;
-      if(engine === 'youtube') url = 'https://www.youtube.com/results?search_query=' + query;
-      if(engine === 'wiki') url = 'https://en.wikipedia.org/wiki/' + query;
-      
-      window.open(url, '_blank');
-      document.getElementById('searchInput').value = ''; // Clear box
-    }
-
-    // Allow pressing "Enter" to search
-    document.getElementById('searchInput').addEventListener("keypress", function(e) {
-      if (e.key === "Enter") performSearch();
-    });
-
-    // --- 3. FOCUS TIMER ---
-    let timerInterval;
-    let timeLeft = 25 * 60; // 25 minutes
-    
-    function updateTimerDisplay() {
-      const m = Math.floor(timeLeft / 60);
-      const s = timeLeft % 60;
-      document.getElementById('timerDisplay').textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
-    }
-
-    function startTimer() {
-      if(timerInterval) return; // Already running
-      timerInterval = setInterval(() => {
-        if(timeLeft > 0) {
-          timeLeft--;
-          updateTimerDisplay();
-        } else {
-          alert("Time's Up!");
-          resetTimer();
-        }
-      }, 1000);
-    }
-
-    function pauseTimer() { clearInterval(timerInterval); timerInterval = null; }
-    
-    function resetTimer() { 
-      pauseTimer(); 
-      timeLeft = 25 * 60; 
-      updateTimerDisplay(); 
-    }
-
-    // --- 4. WEATHER (Simple Fetch) ---
-    async function getWeather() {
-      try {
-        const response = await fetch('https://wttr.in/?format=3'); // Returns text like "Nairobi: 25C"
-        const text = await response.text();
-        document.getElementById('weatherText').textContent = text;
-      } catch (e) {
-        document.getElementById('weatherText').textContent = "Weather Unavailable";
+    // --- INITIALIZE ---
+    document.addEventListener('DOMContentLoaded', () => {
+      // Background Loader
+      const bg = localStorage.getItem('hubWallpaper');
+      if(bg) {
+        document.body.style.backgroundImage = `linear-gradient(rgba(15,18,32,0.7), rgba(15,18,32,0.7)), url('${bg}')`;
       }
-    }
 
-    // --- 5. SMART LINKS ---
-    function getSmartIcon(name) {
-      const n = name.toLowerCase();
-      if (n.includes('amazon') || n.includes('shop') || n.includes('buy')) return '🛍️';
-      if (n.includes('discord') || n.includes('chat')) return '💬';
-      if (n.includes('game') || n.includes('roblox')) return '🎮';
-      if (n.includes('music') || n.includes('spotify')) return '🎵';
-      if (n.includes('netflix') || n.includes('watch') || n.includes('yt')) return '📺';
-      if (n.includes('code') || n.includes('git')) return '💻';
-      if (n.includes('social') || n.includes('insta')) return '📱';
-      return '🌐';
-    }
-
-    function loadCustomLinks() {
-      const customLinks = JSON.parse(localStorage.getItem('customLinks') || '[]');
+      // Load Links
+      const links = JSON.parse(localStorage.getItem('customLinks') || '[]');
       const grid = document.getElementById('mainGrid');
-      customLinks.forEach(link => {
+      links.forEach(l => {
         const a = document.createElement('a');
-        a.href = link.url;
-        a.target = "_blank";
-        a.className = "nav-card";
-        const icon = getSmartIcon(link.name);
-        a.innerHTML = `<span>${icon}</span><b>${link.name}</b>`;
+        a.href = l.url; a.target = "_blank"; a.className = "nav-card";
+        a.innerHTML = `<span>🌐</span><b>${l.name}</b>`;
         grid.appendChild(a);
       });
-    }
 
-    // --- 6. INIT ---
-    function updateClock() { 
-      const now = new Date();
-      document.getElementById('clock').textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); 
-      document.getElementById('dateDisplay').textContent = now.toLocaleDateString();
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      applyTheme();
-      loadCustomLinks();
-      getWeather();
-      setInterval(updateClock, 1000); updateClock();
-      
+      // User Data
       document.getElementById('userName').textContent = localStorage.getItem('storedUsername') || 'Guest';
-      
-      if(localStorage.getItem('userRole') === 'admin') {
-        document.getElementById('adminBtn').style.display = 'flex';
-      }
+      if(localStorage.getItem('userRole') === 'admin') document.getElementById('adminBtn').style.display = 'flex';
 
-      const note = document.getElementById('noteArea');
-      note.value = localStorage.getItem('userNote') || '';
-      note.addEventListener('input', () => localStorage.setItem('userNote', note.value));
+      // Sound Attachments
+      document.querySelectorAll('button, .nav-card').forEach(el => {
+        el.addEventListener('click', () => playSfx(400));
+        el.addEventListener('mouseenter', () => playSfx(800));
+      });
     });
+
+    function performSearch() {
+      const q = document.getElementById('searchInput').value;
+      if(q) window.open('https://www.google.com/search?q=' + q, '_blank');
+    }
   </script>
 </body>
 </html>
