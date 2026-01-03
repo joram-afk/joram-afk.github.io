@@ -8,12 +8,11 @@
         canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
         .login-box {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(11, 14, 26, 0.9); padding: 40px; border: 1px solid #00ff41;
-            border-radius: 15px; text-align: center; box-shadow: 0 0 30px rgba(0,255,65,0.2); z-index: 10; width: 320px;
+            background: rgba(11, 14, 26, 0.95); padding: 40px; border: 1px solid #00ff41;
+            border-radius: 15px; text-align: center; box-shadow: 0 0 30px rgba(0,255,65,0.3); z-index: 10; width: 320px; backdrop-filter: blur(10px);
         }
         h2 { color: #00ff41; margin-bottom: 25px; letter-spacing: 3px; font-size: 1.2rem; }
         input { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; border: 1px solid #333; color: #00ff41; border-radius: 8px; outline: none; box-sizing: border-box; }
-        input:focus { border-color: #00ff41; }
         .btn { width: 100%; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 8px; border: none; transition: 0.3s; margin-bottom: 10px; }
         .primary-btn { background: #00ff41; color: #000; }
         .guest-btn { background: transparent; color: #888; border: 1px solid #333; }
@@ -24,10 +23,10 @@
     <canvas id="matrix"></canvas>
     <div class="login-box">
         <h2>SYSTEM ACCESS</h2>
-        <input type="text" id="user" placeholder="Username">
-        <input type="password" id="pass" placeholder="Access Key">
-        <button class="btn primary-btn" onclick="login('admin')">INITIALIZE</button>
-        <button class="btn guest-btn" onclick="login('guest')">LOGIN AS GUEST</button>
+        <input type="text" id="user" placeholder="Enter Name">
+        <input type="password" id="pass" placeholder="Admin Key (Optional for Guest)">
+        <button class="btn primary-btn" onclick="login('admin')">ADMIN LOGIN</button>
+        <button class="btn guest-btn" onclick="login('guest')">GUEST ACCESS</button>
     </div>
 
     <script>
@@ -58,16 +57,15 @@
         function login(mode) {
             const user = document.getElementById('user').value || "Guest";
             const pass = document.getElementById('pass').value;
-
             if (mode === 'admin') {
                 if (pass === 'joram') {
                     localStorage.setItem('userRole', 'admin');
                     localStorage.setItem('storedUsername', user);
                     location.href = 'gemini.html';
-                } else { alert('INVALID KEY'); }
+                } else { alert('ACCESS DENIED'); }
             } else {
                 localStorage.setItem('userRole', 'guest');
-                localStorage.setItem('storedUsername', 'Guest User');
+                localStorage.setItem('storedUsername', user);
                 location.href = 'gemini.html';
             }
         }
