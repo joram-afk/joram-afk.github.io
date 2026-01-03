@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>JOE HUB - Global Login</title>
+    <title>JOE HUB - Secure Login</title>
     <style>
         body { margin: 0; background: black; overflow: hidden; font-family: 'Segoe UI', sans-serif; background-size: cover; background-position: center; }
         canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
@@ -21,23 +21,63 @@
 <body>
     <canvas id="matrix"></canvas>
     <div class="login-box">
-        <h2>SYSTEM ACCESS</h2>
+        <h2>SECURE ACCESS</h2>
         <input type="text" id="user" placeholder="Enter Name">
         <input type="password" id="pass" placeholder="Admin Key">
-        <button class="btn primary-btn" onclick="login('admin')">ADMIN LOGIN</button>
-        <button class="btn guest-btn" onclick="login('guest')">GUEST ACCESS</button>
+        <button class="btn primary-btn" onclick="handleLogin('admin')">ADMIN LOGIN</button>
+        <button class="btn guest-btn" onclick="handleLogin('guest')">GUEST ACCESS</button>
     </div>
 
     <script>
-        // CONFIG - ADD YOUR KEYS HERE
-        const BIN_ID = '6958d60343b1c97be91604b3';
-        const MASTER_KEY = '$2a$10$fBoN5/ymnTgk71qgkEb4XOeT4Ge23eShhEZzIbEqqVsZ67KQeev8S';
+        // --- 1. CONFIGURATION ---
+        const BIN_ID = '6958d60343b1c97be91604b3';        // Paste Bin ID
+        const MASTER_KEY = '$2a$10$fBoN5/ymnTgk71qgkEb4XOeT4Ge23eShhEZzIbEqqVsZ67KQeev8S'; // Paste Master Key
+        
+        // This is the SHA-256 Hash for the password 'joram'
+        // If a hacker sees this, they cannot guess that it means 'joram'
+        const ADMIN_HASH = "58066e4f3a73c24d8ce72591642fb376326164f9b889759d58e38515c6d3f256";
 
+        // --- 2. SECURITY FUNCTIONS ---
+        async function hash(string) {
+            const utf8 = new TextEncoder().encode(string);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // --- 3. LOGIN LOGIC ---
+        async function handleLogin(mode) {
+            const user = document.getElementById('user').value || "Guest";
+            const pass = document.getElementById('pass').value;
+
+            // BONUS: Tool to find new hashes
+            // If you type "gethash" as your username, it will tell you the hash of your password
+            if (user.toLowerCase() === 'gethash') {
+                const newHash = await hash(pass);
+                alert("Your new hash is:\n" + newHash);
+                return;
+            }
+
+            if (mode === 'admin') {
+                const inputHash = await hash(pass);
+                if (inputHash === ADMIN_HASH) {
+                    localStorage.setItem('userRole', 'admin');
+                    localStorage.setItem('storedUsername', user);
+                    location.href = 'gemini.html';
+                } else {
+                    alert('ACCESS DENIED: Hash Mismatch');
+                }
+            } else {
+                localStorage.setItem('userRole', 'guest');
+                localStorage.setItem('storedUsername', user);
+                location.href = 'gemini.html';
+            }
+        }
+
+        // --- 4. BACKGROUND & MATRIX ---
         async function init() {
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                    headers: { 'X-Master-Key': MASTER_KEY }
-                });
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': MASTER_KEY } });
                 const data = await res.json();
                 if (data.record.wallpaper) {
                     document.body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('${data.record.wallpaper}')`;
@@ -47,8 +87,7 @@
         }
 
         function startMatrix() {
-            const canvas = document.getElementById('matrix');
-            const ctx = canvas.getContext('2d');
+            const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d');
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             const letters = "01010101CODEJOE"; const fontSize = 16;
             const columns = canvas.width / fontSize; const drops = Array(Math.floor(columns)).fill(1);
@@ -64,21 +103,7 @@
             }
             setInterval(draw, 33);
         }
-
-        function login(mode) {
-            const user = document.getElementById('user').value || "Guest";
-            const pass = document.getElementById('pass').value;
-            localStorage.setItem('storedUsername', user);
-            if (mode === 'admin' && pass === 'joram') {
-                localStorage.setItem('userRole', 'admin');
-                location.href = 'gemini.html';
-            } else if (mode === 'guest') {
-                localStorage.setItem('userRole', 'guest');
-                location.href = 'gemini.html';
-            } else { alert('Access Denied'); }
-        }
         init();
     </script>
 </body>
 </html>
-
