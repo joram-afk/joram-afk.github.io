@@ -54,7 +54,7 @@
   <div class="operator-tag">OPERATOR: <span id="displayUser" style="color:var(--primary)">---</span></div>
 
   <div class="search-box">
-    <input type="text" id="sIn" placeholder="Search Google or enter URL...">
+    <input type="text" id="sIn" class="search-input" placeholder="Search Google or enter URL...">
     <button class="search-btn" onclick="go()">SEARCH</button>
   </div>
 
@@ -104,11 +104,24 @@
     }
 
     function go() {
-      let val = document.getElementById('sIn').valUe;
+      let val = document.getElementById('sIn').value;
       if(!val) return;
-      if(val.includes('.') && !val.startsWith('http')) val = 'https://' + val;
-      window.open(val.startsWith('http') ? val : 'https://google.com/search?q='+val, '_blank');
+      
+      // If it looks like a URL, go there. If not, search Google.
+      if(val.includes('.') && !val.startsWith('http')) {
+          val = 'https://' + val;
+      }
+      
+      const url = val.startsWith('http') ? val : 'https://google.com/search?q=' + encodeURIComponent(val);
+      window.open(url, '_blank');
     }
+
+    // This makes the 'Enter' key work for searching
+    document.getElementById('sIn').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            go();
+        }
+    });
 
     function logout() { 
         localStorage.removeItem('userRole'); 
@@ -123,3 +136,4 @@
   </script>
 </body>
 </html>
+
