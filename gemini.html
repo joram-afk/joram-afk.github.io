@@ -2,98 +2,81 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>JOE HUB - Ultimate</title>
+  <title>JOE HUB - Dashboard</title>
   <style>
-    :root { --primary: #6c9cff; --bg: #0f1220; --card-bg: rgba(26, 31, 53, 0.85); --text: #eaeefc; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: 'Segoe UI', sans-serif; background: var(--bg); background-size: cover; background-attachment: fixed; background-position: center;
-      color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px;
-    }
-    #adminBtn { position: fixed; top: 20px; right: 20px; background: var(--card-bg); border: 1px solid var(--primary); color: var(--primary); width: 50px; height: 50px; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; }
-    .brand { font-size: 3rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 4px; margin-top: 20px;}
-    .search-box { display: flex; gap: 10px; background: var(--card-bg); padding: 10px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 600px; margin: 30px 0; backdrop-filter: blur(10px); }
-    .search-input { flex: 1; background: transparent; border: none; color: white; font-size: 1.1rem; outline: none; padding-left: 15px; }
-    .search-btn { background: var(--primary); color: #000; border: none; padding: 10px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; }
-    .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; max-width: 900px; }
-    .nav-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 25px; text-decoration: none; color: white; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.3s; backdrop-filter: blur(5px); }
-    .nav-card:hover { transform: translateY(-5px); border-color: var(--primary); background: rgba(108, 156, 255, 0.2); }
-    .sticky-note { width: 100%; max-width: 900px; background: var(--primary); padding: 20px; border-radius: 15px; margin: 40px 0; color: #000; font-weight: bold; }
-    textarea { width: 100%; background: rgba(255,255,255,0.3); border: none; border-radius: 8px; padding: 10px; margin-top: 10px; outline: none; resize: none; }
-    footer { display: flex; gap: 15px; margin-top: auto; }
-    .btn { padding: 12px 30px; border-radius: 8px; cursor: pointer; font-weight: bold; border: none; }
-    .back-btn { background: var(--card-bg); color: var(--primary); border: 1px solid var(--primary); }
-    .quit-btn { background: #442b2b; color: #ff6c6c; border: 1px solid #ff6c6c; }
-    @media (max-width: 700px) { .dashboard-grid { grid-template-columns: repeat(2, 1fr); } }
+    :root { --primary: #6c9cff; --bg: #0f1220; --card: rgba(26, 31, 53, 0.9); }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); background-size: cover; background-attachment: fixed; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; min-height: 100vh;}
+    
+    #adminBtn { position: fixed; top: 20px; right: 20px; background: var(--card); border: 1px solid var(--primary); color: var(--primary); width: 45px; height: 45px; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer; }
+    
+    .brand { font-size: 2.5rem; font-weight: 900; color: var(--primary); letter-spacing: 5px; margin-top: 40px; }
+    .operator-tag { font-size: 0.9rem; opacity: 0.7; margin-bottom: 30px; }
+    
+    .search-box { display: flex; background: var(--card); padding: 8px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 500px; margin-bottom: 40px; }
+    .search-input { flex: 1; background: transparent; border: none; color: white; padding: 10px 20px; outline: none; }
+    .search-btn { background: var(--primary); border: none; padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; width: 100%; max-width: 800px; }
+    .card { background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; text-decoration: none; color: white; text-align: center; transition: 0.3s; }
+    .card:hover { border-color: var(--primary); transform: translateY(-5px); background: rgba(108, 156, 255, 0.1); }
+    
+    .footer-btns { margin-top: auto; padding: 40px; display: flex; gap: 15px; }
+    .logout-btn { background: #ff4757; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
   </style>
 </head>
 <body>
   <div id="adminBtn" onclick="location.href='admin.html'">⚙️</div>
+  
   <h1 class="brand">JOE HUB</h1>
-  <p>Operator: <span id="userName" style="color:var(--primary);">User</span></p>
+  <div class="operator-tag">OPERATOR: <span id="displayUser" style="color:var(--primary)">---</span></div>
 
   <div class="search-box">
-    <input type="text" class="search-input" id="searchInput" placeholder="Search or Enter URL...">
-    <button class="search-btn" onclick="performSearch()">GO</button>
+    <input type="text" id="sIn" placeholder="Enter URL or Search...">
+    <button class="search-btn" onclick="go()">GO</button>
   </div>
 
-  <div class="dashboard-grid" id="mainGrid">
-    <a href="https://www.youtube.com" target="_blank" class="nav-card"><span>🎬</span><b>YouTube</b></a>
+  <div class="grid" id="mainGrid">
+    <a href="https://youtube.com" target="_blank" class="card">🎬<br><b>YouTube</b></a>
   </div>
 
-  <div class="sticky-note">
-    📌 SYSTEM NOTES
-    <textarea id="noteArea" rows="3"></textarea>
+  <div class="footer-btns">
+    <button class="logout-btn" onclick="logout()">TERMINAL LOGOUT</button>
   </div>
-
-  <footer>
-    <button class="btn back-btn" onclick="location.href='candy.html'">BACK</button>
-    <button class="btn quit-btn" onclick="localStorage.removeItem('userRole'); location.href='index.html'">LOGOUT</button>
-  </footer>
 
   <script>
-    function performSearch() {
-      let q = document.getElementById('searchInput').value;
-      if (!q) return;
-      if (q.includes('.') && !q.startsWith('http')) q = 'https://' + q;
-      window.open(q.startsWith('http') ? q : 'https://www.google.com/search?q=' + q, '_blank');
+    function go() {
+      let val = document.getElementById('sIn').value;
+      if(!val) return;
+      if(val.includes('.') && !val.startsWith('http')) val = 'https://' + val;
+      window.open(val.startsWith('http') ? val : 'https://google.com/search?q='+val, '_blank');
     }
 
-    function playSfx(freq) {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.1);
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.start(); osc.stop(ctx.currentTime + 0.1);
+    function logout() {
+      localStorage.removeItem('userRole');
+      location.href = 'index.html';
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      const bg = localStorage.getItem('hubWallpaper');
-      if(bg) document.body.style.backgroundImage = `linear-gradient(rgba(15,18,32,0.7), rgba(15,18,32,0.7)), url('${bg}')`;
+      // 1. Setup User & Admin Gear
+      const user = localStorage.getItem('storedUsername') || 'Guest';
+      const role = localStorage.getItem('userRole');
+      document.getElementById('displayUser').textContent = user.toUpperCase();
+      if(role === 'admin') document.getElementById('adminBtn').style.display = 'flex';
 
+      // 2. Background
+      const bg = localStorage.getItem('hubWallpaper');
+      if(bg) document.body.style.backgroundImage = `linear-gradient(rgba(15,18,32,0.8), rgba(15,18,32,0.8)), url('${bg}')`;
+
+      // 3. Load Dynamic Links
       const links = JSON.parse(localStorage.getItem('customLinks') || '[]');
       const grid = document.getElementById('mainGrid');
       links.forEach(l => {
         const a = document.createElement('a');
+        a.className = 'card'; a.target = '_blank';
         a.href = l.url.includes('http') ? l.url : 'https://' + l.url;
-        a.target = "_blank"; a.className = "nav-card";
-        a.innerHTML = `<span>🌐</span><b>${l.name}</b>`;
+        a.innerHTML = `🌐<br><b>${l.name}</b>`;
         grid.appendChild(a);
       });
-
-      if(localStorage.getItem('userRole') === 'admin') document.getElementById('adminBtn').style.display = 'flex';
-      document.getElementById('userName').textContent = localStorage.getItem('storedUsername') || 'Guest';
-
-      document.querySelectorAll('button, .nav-card').forEach(el => {
-        el.addEventListener('click', () => playSfx(400));
-        el.addEventListener('mouseenter', () => playSfx(800));
-      });
-      
-      const note = document.getElementById('noteArea');
-      note.value = localStorage.getItem('userNote') || '';
-      note.oninput = () => localStorage.setItem('userNote', note.value);
     });
   </script>
 </body>
