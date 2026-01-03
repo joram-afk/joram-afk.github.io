@@ -16,26 +16,26 @@
         .btn { width: 100%; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 8px; border: none; transition: 0.3s; margin-bottom: 10px; }
         .primary-btn { background: #00ff41; color: #000; }
         .guest-btn { background: transparent; color: #888; border: 1px solid #333; }
+        .guest-btn:hover { color: white; border-color: white; }
     </style>
 </head>
 <body>
     <canvas id="matrix"></canvas>
     <div class="login-box">
         <h2>SECURE ACCESS</h2>
-        <input type="text" id="user" placeholder="Enter Name">
+        <input type="text" id="user" placeholder="Enter Username">
         <input type="password" id="pass" placeholder="Admin Key">
         <button class="btn primary-btn" onclick="handleLogin('admin')">ADMIN LOGIN</button>
         <button class="btn guest-btn" onclick="handleLogin('guest')">GUEST ACCESS</button>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION ---
-        const BIN_ID = '6958d60343b1c97be91604b3';        // Paste Bin ID
-        const MASTER_KEY = '$2a$10$fBoN5/ymnTgk71qgkEb4XOeT4Ge23eShhEZzIbEqqVsZ67KQeev8S'; // Paste Master Key
+        // --- 1. PASTE YOUR KEYS HERE ---
+        const BIN_ID = '6958d60343b1c97be91604b3';
+        const MASTER_KEY = '$2a$10$fBoN5/ymnTgk71qgkEb4XOeT4Ge23eShhEZzIbEqqVsZ67KQeev8S';
         
-        // This is the SHA-256 Hash for the password 'joram'
-        // If a hacker sees this, they cannot guess that it means 'joram'
-        const ADMIN_HASH = "2a42702b0ea9784979615db8283c6f128c9963f1a8f24ab174511bb0655c2e5c";
+        // Hash for password 'joram'
+        const ADMIN_HASH = "58066e4f3a73c24d8ce72591642fb376326164f9b889759d58e38515c6d3f256";
 
         // --- 2. SECURITY FUNCTIONS ---
         async function hash(string) {
@@ -45,29 +45,49 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // --- 3. LOGIN LOGIC ---
+        // --- 3. UPDATED LOGIN LOGIC ---
         async function handleLogin(mode) {
-            const user = document.getElementById('user').value || "Guest";
-            const pass = document.getElementById('pass').value;
+            const userField = document.getElementById('user');
+            const passField = document.getElementById('pass');
+            
+            // Trim removes accidental spaces
+            const user = userField.value.trim();
+            const pass = passField.value.trim();
 
-            // BONUS: Tool to find new hashes
-            // If you type "gethash" as your username, it will tell you the hash of your password
-            if (user.toLowerCase() === 'gethash') {
+            // RULE 1: Username cannot be blank for anyone
+            if (user === "") {
+                alert("Please enter a Username.");
+                userField.focus();
+                return;
+            }
+
+            // SECRET TOOL: Check hash of any password
+            if (user.toLowerCase() === 'gethash' && pass !== "") {
                 const newHash = await hash(pass);
                 alert("Your new hash is:\n" + newHash);
                 return;
             }
 
             if (mode === 'admin') {
+                // RULE 2: Password cannot be blank for Admin
+                if (pass === "") {
+                    alert("Password field cannot be left blank.");
+                    passField.focus();
+                    return;
+                }
+
+                // RULE 3: Check Password
                 const inputHash = await hash(pass);
                 if (inputHash === ADMIN_HASH) {
                     localStorage.setItem('userRole', 'admin');
                     localStorage.setItem('storedUsername', user);
                     location.href = 'gemini.html';
                 } else {
-                    alert('ACCESS DENIED: Hash Mismatch');
+                    alert('INCORRECT PASSWORD'); // New Simple Error Message
+                    passField.value = ""; // Clear the wrong password
                 }
             } else {
+                // Guest Login (Password not required)
                 localStorage.setItem('userRole', 'guest');
                 localStorage.setItem('storedUsername', user);
                 location.href = 'gemini.html';
@@ -107,4 +127,3 @@
     </script>
 </body>
 </html>
-
