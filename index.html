@@ -1,80 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JOE HUB - Startup</title>
-  <style>
-    :root { --primary: #6c9cff; --bg: #722fca5e; --card: #161b33; --error: #ff4757; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    .login-card { background: var(--card); padding: 40px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; border: 1px solid rgba(108, 156, 255, 0.2); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-    .shake { animation: shake 0.4s; }
-    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
-    .logo { font-size: 2.5rem; font-weight: 900; letter-spacing: 5px; color: var(--primary); margin-bottom: 30px; text-shadow: 0 0 10px rgba(108, 156, 255, 0.5); }
-    .loader-container { width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-bottom: 30px; overflow: hidden; }
-    .loader-bar { width: 0%; height: 100%; background: var(--primary); transition: width 2s ease-in-out; }
-    .input-group { margin-bottom: 15px; text-align: left; }
-    label { font-size: 0.75rem; color: #aab4d4; margin-left: 5px; text-transform: uppercase; }
-    input { width: 100%; padding: 12px; margin-top: 5px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; outline: none; }
-    .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
-    .btn { width: 100%; padding: 14px; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s; border: none; }
-    .btn-login { background: var(--primary); color: #0b0e1a; }
-    .btn-guest { background: transparent; color: #aab4d4; border: 1px solid #aab4d4; }
-    #error-msg { color: var(--error); font-size: 0.8rem; margin-top: 15px; display: none; }
-  </style>
+    <meta charset="UTF-8">
+    <title>JOE HUB - Access Point</title>
+    <style>
+        body { margin: 0; background: black; overflow: hidden; font-family: 'Courier New', monospace; background-size: cover; background-position: center; }
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+        .login-box {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85); padding: 40px; border: 2px solid #00ff41;
+            border-radius: 10px; text-align: center; box-shadow: 0 0 20px #00ff41; z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+        h2 { color: #00ff41; margin-bottom: 20px; letter-spacing: 5px; }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; background: #000; border: 1px solid #00ff41; color: #00ff41; outline: none; }
+        button { background: #00ff41; color: black; border: none; padding: 12px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
+        button:hover { background: white; box-shadow: 0 0 15px white; }
+    </style>
 </head>
 <body>
-  <div class="login-card" id="card">
-    <div class="logo"> JOE HUB</div>
-    <div id="boot-sequence">
-      <p style="font-size: 0.8rem; color: #6c9cff; margin-bottom: 10px;">ENCRYPTING CONNECTION...</p>
-      <div class="loader-container"><div class="loader-bar" id="loader"></div></div>
+    <canvas id="matrix"></canvas>
+    <div class="login-box">
+        <h2>TERMINAL LOGIN</h2>
+        <input type="password" id="pass" placeholder="ACCESS KEY...">
+        <button onclick="checkPass()">INITIALIZE</button>
     </div>
-    <div id="login-form" style="display: none;">
-      <div class="input-group">
-        <label>Operator Name</label>
-        <input type="text" id="nameInput" placeholder="Enter name...">
-      </div>
-      <div class="input-group">
-        <label>Access Key</label>
-        <input type="password" id="passInput" placeholder="••••••••">
-      </div>
-      <div class="btn-group">
-        <button class="btn btn-login" onclick="validateLogin()">ENTER</button>
-        <button class="btn btn-guest" onclick="startGuest()">GUEST MODE</button>
-      </div>
-      <p id="error-msg">ACCESS DENIED: INVALID KEY PLEASE TRY AGAIN LATER</p>
-    </div>
-  </div>
-  <script>
-    window.onload = () => {
-      setTimeout(() => { document.getElementById('loader').style.width = '100%'; }, 100);
-      setTimeout(() => {
-        document.getElementById('boot-sequence').style.display = 'none';
-        document.getElementById('login-form').style.display = 'block';
-        document.getElementById('nameInput').focus();
-      }, 2200);
-    };
-    function validateLogin() {
-      const name = document.getElementById('nameInput').value;
-      const pass = document.getElementById('passInput').value;
-      if (name.trim() !== "" && pass === "joram") {
-        localStorage.setItem('storedUsername', name);
-        localStorage.setItem('userRole', 'admin');
-        window.location.href = 'candy.html';
-      } else {
-        document.getElementById('card').classList.add('shake');
-        document.getElementById('error-msg').style.display = 'block';
-        setTimeout(() => { document.getElementById('card').classList.remove('shake'); }, 400);
-      }
-    }
-    function startGuest() {
-      localStorage.setItem('storedUsername', 'Guest User');
-      localStorage.setItem('userStatus', 'Guest Session');
-      localStorage.setItem('userRole', 'guest');
-      window.location.href = 'candy.html';
-    }
-  </script>
+
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        const savedBg = localStorage.getItem('hubWallpaper');
+
+        if (savedBg) {
+            document.body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${savedBg}')`;
+            canvas.style.display = "none"; 
+        } else {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            const fontSize = 16;
+            const columns = canvas.width / fontSize;
+            const drops = Array(Math.floor(columns)).fill(1);
+            function draw() {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#00ff41";
+                ctx.font = fontSize + "px arial";
+                for (let i = 0; i < drops.length; i++) {
+                    const text = letters[Math.floor(Math.random() * letters.length)];
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+            }
+            setInterval(draw, 33);
+        }
+
+        function checkPass() {
+            if(document.getElementById('pass').value === 'joram') {
+                localStorage.setItem('userRole', 'admin');
+                location.href = 'candy.html';
+            } else { alert('ACCESS DENIED'); }
+        }
+    </script>
 </body>
 </html>
