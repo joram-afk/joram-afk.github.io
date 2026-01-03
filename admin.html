@@ -2,50 +2,90 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Control Panel</title>
+  <title>Admin Control Panel</title>
   <style>
-    body { background: #0b0e1a; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 50px; }
-    .panel { background: #161b33; padding: 30px; border-radius: 15px; border: 1px solid #6c9cff; width: 400px; }
-    input { width: 100%; padding: 10px; margin: 10px 0; background: #000; border: 1px solid #333; color: white; box-sizing: border-box; }
-    .btn { width: 100%; padding: 12px; cursor: pointer; border: none; font-weight: bold; border-radius: 5px; margin-top: 10px; }
-    .save { background: #6c9cff; color: #000; }
-    .clear { background: transparent; color: #ff4757; border: 1px solid #ff4757; font-size: 0.8rem; }
+    :root { --primary: #6c9cff; --bg: #0b0e1a; --card: #161b33; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; padding: 20px; display: flex; justify-content: center; background-size: cover; background-position: center; }
+    .admin-card { background: rgba(22, 27, 51, 0.95); padding: 30px; border-radius: 20px; border: 1px solid var(--primary); width: 100%; max-width: 450px; backdrop-filter: blur(10px); }
+    .section { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+    label { font-size: 0.8rem; color: #aab4d4; display: block; margin-bottom: 5px; }
+    input { width: 100%; padding: 10px; background: #000; border: 1px solid #333; border-radius: 8px; color: white; margin-bottom: 10px; outline: none; box-sizing: border-box; }
+    .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 5px; }
+    .save-btn { background: var(--primary); color: #0b0e1a; }
+    .back-btn { background: transparent; color: #aab4d4; border: 1px solid #aab4d4; margin-top: 15px; }
+    .link-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(0,0,0,0.3); margin-top: 5px; border-radius: 5px; }
+    .del-btn { background: #ff4757; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; }
   </style>
 </head>
 <body>
-  <div class="panel">
-    <h2>ADMIN CONTROL</h2>
-    <hr style="opacity:0.1">
-    
-    <p>Site Background</p>
-    <input type="text" id="bgIn" placeholder="Image Link URL">
-    <button class="btn save" onclick="setBg()">UPDATE BACKGROUND</button>
-    <button class="btn clear" onclick="localStorage.removeItem('hubWallpaper'); location.reload();">RESTORE MATRIX</button>
+  <div class="admin-card">
+    <h2 style="text-align:center; color:var(--primary); margin-bottom:20px;">⚙️ MASTER CONTROL</h2>
 
-    <br><br>
-    <p>Add New Hub Link</p>
-    <input type="text" id="nIn" placeholder="Site Name">
-    <input type="text" id="uIn" placeholder="URL (https://...)">
-    <button class="btn save" onclick="add()">ADD TO HUB</button>
-    
-    <button class="btn" style="background:#333; color:white;" onclick="location.href='gemini.html'">RETURN</button>
+    <div class="section">
+      <label>GLOBAL WALLPAPER URL</label>
+      <input type="text" id="bgUrl" placeholder="Paste image link...">
+      <button class="save-btn btn" onclick="saveBg()">APPLY TO ALL USERS</button>
+    </div>
+
+    <div class="section">
+      <label>ADD LINK FOR ALL USERS</label>
+      <input type="text" id="linkName" placeholder="Site Name">
+      <input type="text" id="linkUrl" placeholder="https://...">
+      <button class="save-btn btn" onclick="addLink()">ADD TO HUB</button>
+    </div>
+
+    <div class="section">
+      <label>MANAGE / DELETE LINKS</label>
+      <div id="deleteList"></div>
+    </div>
+
+    <button class="back-btn btn" onclick="location.href='gemini.html'">RETURN TO HUB</button>
   </div>
 
   <script>
-    function setBg() {
-      const val = document.getElementById('bgIn').value;
-      if(val) { localStorage.setItem('hubWallpaper', val); alert('Background Set!'); }
+    // SECURITY CHECK: If not admin, kick them out
+    if(localStorage.getItem('userRole') !== 'admin') {
+        alert("ACCESS DENIED: Admins only.");
+        location.href = 'gemini.html';
     }
-    function add() {
-      const name = document.getElementById('nIn').value;
-      const url = document.getElementById('uIn').value;
+
+    function saveBg() {
+      const url = document.getElementById('bgUrl').value;
+      if(url) { localStorage.setItem('hubWallpaper', url); location.reload(); }
+    }
+
+    function renderDeleteList() {
+      const listDiv = document.getElementById('deleteList');
+      const links = JSON.parse(localStorage.getItem('customLinks') || '[]');
+      listDiv.innerHTML = links.map((link, i) => `
+        <div class="link-item">
+          <span>${link.name}</span>
+          <button class="del-btn" onclick="deleteLink(${i})">DELETE</button>
+        </div>
+      `).join('');
+    }
+
+    function addLink() {
+      const name = document.getElementById('linkName').value;
+      const url = document.getElementById('linkUrl').value;
       if(name && url) {
         let links = JSON.parse(localStorage.getItem('customLinks') || '[]');
         links.push({name, url});
         localStorage.setItem('customLinks', JSON.stringify(links));
-        alert('Added!');
+        renderDeleteList();
       }
     }
+
+    function deleteLink(index) {
+      let links = JSON.parse(localStorage.getItem('customLinks') || '[]');
+      links.splice(index, 1);
+      localStorage.setItem('customLinks', JSON.stringify(links));
+      renderDeleteList();
+    }
+
+    const bg = localStorage.getItem('hubWallpaper');
+    if(bg) document.body.style.backgroundImage = `linear-gradient(rgba(11,14,26,0.8), rgba(11,14,26,0.8)), url('${bg}')`;
+    renderDeleteList();
   </script>
 </body>
 </html>
