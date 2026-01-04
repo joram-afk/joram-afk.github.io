@@ -2,75 +2,83 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>JOE HUB - Universal Terminal</title>
+  <title>JOE HUB - Terminal</title>
   <style>
-    :root { --primary: #6c9cff; --bg: #0f1220; --card: rgba(26, 31, 53, 0.85); }
+    :root { --primary: #6c9cff; --bg: #0f1220; --card: rgba(26, 31, 53, 0.9); }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); background-size: cover; background-attachment: fixed; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; min-height: 100vh;}
     
-    body { 
-        font-family: 'Segoe UI', sans-serif; 
-        background: var(--bg); 
-        background-size: cover; 
-        background-position: center;
-        background-attachment: fixed; 
-        color: white; 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        padding: 20px; 
-        margin: 0; 
-        min-height: 100vh;
-        transition: background 0.5s ease;
-    }
+    #adminBtn { position: fixed; top: 20px; right: 20px; background: var(--card); border: 1px solid var(--primary); color: var(--primary); width: 45px; height: 45px; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 100; transition: 0.3s; }
+    
+    /* Clock Styles */
+    #clockBox { margin-top: 20px; text-align: center; }
+    #time { font-size: 3.5rem; font-weight: 200; letter-spacing: 5px; color: var(--primary); line-height: 1; }
+    #date { font-size: 1rem; opacity: 0.6; letter-spacing: 2px; text-transform: uppercase; margin-top: 10px; }
 
-    /* Video Background Styling */
-    #bgVideo {
-        position: fixed;
-        right: 0;
-        bottom: 0;
-        min-width: 100%;
-        min-height: 100%;
-        z-index: -2; /* Behind everything */
-        object-fit: cover;
-        display: none;
-    }
+    .brand { font-size: 1.2rem; font-weight: 900; color: var(--primary); letter-spacing: 8px; margin-top: 30px; opacity: 0.7; }
+    .operator-tag { font-size: 0.8rem; opacity: 0.5; margin-bottom: 20px; }
 
-    /* Dark Overlay to make text readable over bright videos/images */
-    .overlay {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.4);
-        z-index: -1;
+    /* Extended Search Box */
+    .search-box { 
+      display: flex; 
+      background: var(--card); 
+      padding: 10px; 
+      border-radius: 50px; 
+      border: 1px solid rgba(255,255,255,0.1); 
+      width: 100%; 
+      max-width: 800px; /* Matches the grid width */
+      margin: 20px 0 40px 0; 
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
+    .search-input { flex: 1; background: transparent; border: none; color: white; padding: 10px 25px; outline: none; font-size: 1.1rem; }
+    .search-btn { background: var(--primary); border: none; padding: 10px 35px; border-radius: 25px; font-weight: bold; cursor: pointer; color: #0b0e1a; transition: 0.3s; }
+    .search-btn:hover { background: white; transform: scale(1.05); }
 
-    #adminBtn { position: fixed; top: 20px; right: 20px; background: var(--card); border: 1px solid var(--primary); color: var(--primary); width: 45px; height: 45px; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 100; }
-    .brand { font-size: 2.5rem; font-weight: 900; color: var(--primary); letter-spacing: 5px; margin-top: 40px; text-shadow: 0 0 20px rgba(108,156,255,0.5); }
-    .search-box { display: flex; background: var(--card); padding: 8px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 500px; margin: 30px 0; backdrop-filter: blur(10px); }
-    .search-input { flex: 1; background: transparent; border: none; color: white; padding: 10px 20px; outline: none; width: 100%; }
-    .search-btn { background: var(--primary); border: none; padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; color: #0f1220; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 100%; max-width: 800px; }
-    .card { background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; text-decoration: none; color: white; text-align: center; transition: 0.3s; backdrop-filter: blur(10px); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; width: 100%; max-width: 800px; }
+    .card { background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 12px; text-decoration: none; color: white; text-align: center; transition: 0.3s; backdrop-filter: blur(5px); }
     .card:hover { border-color: var(--primary); transform: translateY(-5px); background: rgba(108,156,255,0.1); }
+    
+    .logout-btn { background: #ff4757; color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; margin-top: auto; margin-bottom: 20px; opacity: 0.6; transition: 0.3s; }
+    .logout-btn:hover { opacity: 1; }
   </style>
 </head>
 <body>
-  <video autoplay muted loop playsinline id="bgVideo"></video>
-  <div class="overlay"></div>
-
   <div id="adminBtn" onclick="location.href='admin.html'">⚙️</div>
-  <h1 class="brand">JOE HUB</h1>
-  <p>OPERATOR: <span id="displayUser" style="color:var(--primary)">---</span></p>
-
-  <div class="search-box">
-    <input type="text" id="sIn" class="search-input" placeholder="Search the web...">
-    <button class="search-btn" onclick="go()">GO</button>
+  
+  <div id="clockBox">
+    <div id="time">00:00:00</div>
+    <div id="date">LOADING...</div>
   </div>
 
-  <div class="grid" id="mainGrid"></div>
+  <h1 class="brand">JOE HUB</h1>
+  <div class="operator-tag">OPERATOR: <span id="displayUser" style="color:var(--primary)">---</span></div>
+
+  <div class="search-box">
+    <input type="text" id="sIn" class="search-input" placeholder="Search Google or enter URL...">
+    <button class="search-btn" onclick="go()">SEARCH</button>
+  </div>
+
+  <div class="grid" id="mainGrid">
+    <a href="https://youtube.com" target="_blank" class="card">🎬<br><b>YouTube</b></a>
+  </div>
+
+  <button class="logout-btn" onclick="logout()">TERMINAL LOGOUT</button>
 
   <script>
-    // 1. YOUR CLOUD KEYS
+    // PASTE YOUR EXISTING KEYS HERE
     const BIN_ID = '6958d60343b1c97be91604b3';
     const MASTER_KEY = '$2a$10$fBoN5/ymnTgk71qgkEb4XOeT4Ge23eShhEZzIbEqqVsZ67KQeev8S';
+
+    // Clock Function
+    function updateClock() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+        const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+        document.getElementById('time').textContent = timeStr;
+        document.getElementById('date').textContent = dateStr;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
     async function loadHub() {
         try {
@@ -79,43 +87,45 @@
             });
             const data = await res.json();
             const global = data.record;
-            const videoElement = document.getElementById('bgVideo');
 
-            // 2. SMART WALLPAPER LOGIC
             if(global.wallpaper) {
-                const url = global.wallpaper.toLowerCase();
-                // Check if the link is a video format
-                if(url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.ogg')) {
-                    videoElement.src = global.wallpaper;
-                    videoElement.style.display = 'block';
-                    document.body.style.backgroundImage = "none";
-                } else {
-                    // It's an image or a GIF
-                    videoElement.style.display = 'none';
-                    videoElement.src = "";
-                    document.body.style.backgroundImage = `url('${global.wallpaper}')`;
-                }
+                document.body.style.backgroundImage = `linear-gradient(rgba(15,18,32,0.8), rgba(15,18,32,0.8)), url('${global.wallpaper}')`;
             }
-
-            // 3. LOAD LINKS
+            
             const grid = document.getElementById('mainGrid');
-            grid.innerHTML = '';
+            grid.innerHTML = '<a href="https://youtube.com" target="_blank" class="card">🎬<br><b>YouTube</b></a>';
             global.links.forEach(l => {
-                const a = document.createElement('a');
-                a.className = 'card';
-                a.target = '_blank';
+                const a = document.createElement('a'); a.className = 'card'; a.target = '_blank';
                 a.href = l.url.includes('http') ? l.url : 'https://' + l.url;
-                a.innerHTML = `<div style="font-size:30px; margin-bottom:10px;">🌐</div><b>${l.name}</b>`;
+                a.innerHTML = `🌐<br><b>${l.name}</b>`;
                 grid.appendChild(a);
             });
-        } catch (err) { console.error("Cloud Error:", err); }
+        } catch(e) { console.error("Cloud Connection Failed"); }
     }
 
     function go() {
       let val = document.getElementById('sIn').value;
       if(!val) return;
-      if(val.includes('.') && !val.startsWith('http')) val = 'https://' + val;
-      window.open(val.startsWith('http') ? val : 'https://google.com/search?q='+val, '_blank');
+      
+      // If it looks like a URL, go there. If not, search Google.
+      if(val.includes('.') && !val.startsWith('http')) {
+          val = 'https://' + val;
+      }
+      
+      const url = val.startsWith('http') ? val : 'https://google.com/search?q=' + encodeURIComponent(val);
+      window.open(url, '_blank');
+    }
+
+    // This makes the 'Enter' key work for searching
+    document.getElementById('sIn').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            go();
+        }
+    });
+
+    function logout() { 
+        localStorage.removeItem('userRole'); 
+        location.href = 'index.html'; 
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -126,3 +136,5 @@
   </script>
 </body>
 </html>
+
+
