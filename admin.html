@@ -13,6 +13,7 @@
     .save-btn { background: var(--primary); color: #0b0e1a; }
     .link-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(0,0,0,0.3); margin-top: 5px; border-radius: 5px; }
     .del-btn { background: #ff4757; color: white; padding: 5px; border-radius: 5px; cursor: pointer; }
+    #visitorList { max-height: 150px; overflow-y: auto; font-size: 0.85rem; font-family: monospace; }
   </style>
 </head>
 <body>
@@ -30,6 +31,13 @@
       <button class="save-btn btn" onclick="addLink()">ADD FOR EVERYONE</button>
     </div>
     <div class="section"><div id="deleteList"></div></div>
+
+    <div class="section">
+      <label style="color:var(--primary); font-weight:bold;">VISITOR LOG</label>
+      <div id="visitorList">Loading history...</div>
+      <button class="btn" style="background:#333; font-size:10px;" onclick="clearLogs()">CLEAR HISTORY</button>
+    </div>
+
     <button class="btn" onclick="location.href='gemini.html'">RETURN</button>
   </div>
 
@@ -68,10 +76,26 @@
         await updateCloud(data);
     }
 
+    async function clearLogs() {
+        if(!confirm("Wipe login history?")) return;
+        const data = await getCloud();
+        data.visitors = [];
+        await updateCloud(data);
+    }
+
     async function init() {
         const data = await getCloud();
+        // Update Link List
         const list = document.getElementById('deleteList');
         list.innerHTML = data.links.map((l, i) => `<div class="link-item">${l.name} <button class="del-btn" onclick="deleteLink(${i})">DEL</button></div>`).join('');
+        
+        // Update Visitor Log
+        const vList = document.getElementById('visitorList');
+        if(!data.visitors || data.visitors.length === 0) {
+            vList.innerHTML = "No history found.";
+        } else {
+            vList.innerHTML = data.visitors.reverse().map(v => `<div>[${v.time}] ${v.name}</div>`).join('');
+        }
     }
     init();
   </script>
