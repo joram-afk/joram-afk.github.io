@@ -13,15 +13,28 @@
     .btn { width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; border: none; }
     .btn-enter { background: #6c9cff; color: #0b1020; margin-bottom: 10px; }
     .btn-quit { background: transparent; color: #ff6c6c; border: 1px solid #ff6c6c; }
+
+    /* LOADER */
+    #loader { display: none; margin-top: 20px; }
+    .orbit { width: 40px; height: 40px; position: relative; animation: spin 1s linear infinite; margin: 0 auto; }
+    .orbit::before, .orbit::after, .dot3 { content: ''; position: absolute; width: 8px; height: 8px; background: #6c9cff; border-radius: 50%; box-shadow: 0 0 10px #6c9cff; }
+    .orbit::before { top: 0; left: 50%; transform: translateX(-50%); }
+    .orbit::after { bottom: 0; left: 50%; transform: translateX(-50%); }
+    .dot3 { top: 50%; left: 0; transform: translateY(-50%); }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-  <div class="menu-card">
+  <div class="menu-card" id="mCard">
     <div class="avatar-display" id="avatar">🤖</div>
     <h1 id="greeting">Welcome!</h1>
     <input type="text" id="statusInput" class="status-bar" placeholder="Update your status...">
     <button onclick="enterHub()" class="btn btn-enter">CONTINUE</button>
     <button onclick="localStorage.clear(); window.location.href='index.html'" class="btn btn-quit">🚪 LOGOUT</button>
+    
+    <div id="loader">
+        <div class="orbit"><div class="dot3"></div></div>
+    </div>
   </div>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -31,9 +44,10 @@
       document.getElementById('avatar').textContent = avatars[Math.floor(Math.random() * avatars.length)];
     });
     function enterHub() {
+      document.getElementById('loader').style.display = 'block';
       const status = document.getElementById('statusInput').value;
       if(status) localStorage.setItem('userStatus', status);
-      window.location.href = 'gemini.html';
+      setTimeout(() => { window.location.href = 'gemini.html'; }, 800);
     }
   </script>
 </body>
