@@ -2,13 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>JOE HUB - Terminal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JOE HUB - Premium Tech Resources</title>
   <style>
-    :root { --primary: #6c9cff; --bg: #0f1220; --card: rgba(26, 31, 53, 0.9); }
-    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); background-size: cover; background-attachment: fixed; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; min-height: 100vh;}
-    
+    :root { --primary: #6c9cff; --bg: #0f1220; --card: rgba(26, 31, 53, 0.9); --text: #eaeefc; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); background-size: cover; background-attachment: fixed; color: var(--text); margin: 0; min-height: 100vh; overflow-x: hidden; }
+
+    /* NAVIGATION (Essential for AdSense) */
+    nav { width: 100%; background: rgba(15, 18, 32, 0.95); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(108, 156, 255, 0.2); backdrop-filter: blur(10px); }
+    .nav-logo { font-weight: 900; letter-spacing: 3px; color: var(--primary); font-size: 1.2rem; }
+    .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-size: 0.9rem; opacity: 0.8; transition: 0.3s; }
+    .nav-links a:hover { opacity: 1; color: var(--primary); }
+
     /* ORBIT LOADER */
-    #loader { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; text-align: center; background: var(--bg); width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.5s; }
+    #loader { position: fixed; top: 0; left: 0; z-index: 2000; background: var(--bg); width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.5s; }
     .orbit { width: 60px; height: 60px; position: relative; animation: spin 1s linear infinite; }
     .orbit::before, .orbit::after, .dot3 { content: ''; position: absolute; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 20px var(--primary); }
     .orbit::before { top: 0; left: 50%; transform: translateX(-50%); }
@@ -16,40 +23,94 @@
     .dot3 { top: 50%; left: 0; transform: translateY(-50%); }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    #adminBtn { position: fixed; top: 20px; right: 20px; background: var(--card); border: 1px solid var(--primary); color: var(--primary); width: 45px; height: 45px; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 100; transition: 0.3s; }
-    #clockBox { margin-top: 20px; text-align: center; }
-    #time { font-size: 3.5rem; font-weight: 200; letter-spacing: 5px; color: var(--primary); line-height: 1; }
-    #date { font-size: 1rem; opacity: 0.6; letter-spacing: 2px; text-transform: uppercase; margin-top: 10px; }
-    .brand { font-size: 1.2rem; font-weight: 900; color: var(--primary); letter-spacing: 8px; margin-top: 30px; opacity: 0.7; }
-    .operator-tag { font-size: 0.8rem; opacity: 0.5; margin-bottom: 20px; }
-    .search-box { display: flex; background: var(--card); padding: 10px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 800px; margin: 20px 0 40px 0; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-    .search-input { flex: 1; background: transparent; border: none; color: white; padding: 10px 25px; outline: none; font-size: 1.1rem; }
-    .search-btn { background: var(--primary); border: none; padding: 10px 35px; border-radius: 25px; font-weight: bold; cursor: pointer; color: #0b0e1a; transition: 0.3s; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; width: 100%; max-width: 800px; }
-    .card { background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 12px; text-decoration: none; color: white; text-align: center; transition: 0.3s; backdrop-filter: blur(5px); }
-    .card:hover { border-color: var(--primary); transform: translateY(-5px); background: rgba(108,156,255,0.1); }
-    .logout-btn { background: #ff4757; color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; margin-top: auto; margin-bottom: 20px; opacity: 0.6; transition: 0.3s; }
+    /* CONTENT LAYOUT */
+    .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; text-align: center; }
+    #time { font-size: 3rem; font-weight: 200; color: var(--primary); letter-spacing: 5px; }
+    #date { opacity: 0.5; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 30px; }
+
+    .search-box { display: flex; background: var(--card); padding: 8px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 600px; margin: 0 auto 50px; backdrop-filter: blur(10px); }
+    .search-input { flex: 1; background: transparent; border: none; color: white; padding: 10px 20px; outline: none; }
+    .search-btn { background: var(--primary); border: none; padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; color: #0b0e1a; }
+
+    /* GRID FOR LINKS */
+    h2.section-title { font-size: 0.8rem; letter-spacing: 4px; opacity: 0.4; margin-bottom: 20px; text-transform: uppercase; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 60px; }
+    .card { background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; text-decoration: none; color: white; transition: 0.3s; }
+    .card:hover { border-color: var(--primary); transform: translateY(-3px); background: rgba(108,156,255,0.1); }
+
+    /* BLOG SECTION (Crucial for AdSense) */
+    .blog-section { text-align: left; margin-top: 50px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 50px; }
+    .article-card { background: var(--card); border-radius: 15px; padding: 20px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; border: 1px solid transparent; transition: 0.3s; cursor: pointer; }
+    .article-card:hover { border-color: var(--primary); }
+    .article-thumb { width: 80px; height: 80px; background: #252b48; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+    .article-info h3 { font-size: 1.1rem; margin-bottom: 5px; color: var(--primary); }
+    .article-info p { font-size: 0.85rem; opacity: 0.6; line-height: 1.4; }
+
+    /* FOOTER */
+    footer { margin-top: 100px; padding: 40px; border-top: 1px solid rgba(255,255,255,0.05); opacity: 0.5; font-size: 0.8rem; }
+    .footer-links a { color: white; margin: 0 10px; text-decoration: none; }
+
+    #adminBtn { position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: #000; width: 45px; height: 45px; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 100; font-weight: bold; box-shadow: 0 0 20px rgba(108,156,255,0.5); }
   </style>
 </head>
 <body>
+
   <div id="loader">
-      <div class="orbit"><div class="dot3"></div></div>
-      <p style="color:var(--primary); margin-top:20px; font-size:12px; letter-spacing:3px;">THANK YOU FOR STAYING CONNECTED TO JORAM.WEB...</p>
+    <div class="orbit"><div class="dot3"></div></div>
+    <p style="color:var(--primary); margin-top:20px; font-size:10px; letter-spacing:3px;">SYSTEM INITIALIZING...</p>
   </div>
 
+  <nav>
+    <div class="nav-logo">JOE HUB</div>
+    <div class="nav-links">
+      <a href="#">Home</a>
+      <a href="#articles">Articles</a>
+      <a href="#" onclick="alert('About: JOE HUB is a curated portal for elite tech tools.')">About</a>
+      <a href="mailto:admin@joehub.com">Contact</a>
+    </div>
+  </nav>
+
   <div id="adminBtn" onclick="location.href='admin.html'">⚙️</div>
-  <div id="clockBox">
+
+  <div class="container">
     <div id="time">00:00:00</div>
     <div id="date">LOADING...</div>
+
+    <div class="search-box">
+      <input type="text" id="sIn" class="search-input" placeholder="Search resources...">
+      <button class="search-btn" onclick="go()">SEARCH</button>
+    </div>
+
+    <h2 class="section-title">Verified Resources</h2>
+    <div class="grid" id="mainGrid"></div>
+
+    <div class="blog-section" id="articles">
+      <h2 class="section-title">Latest Tech Insights</h2>
+      
+      <div class="article-card" onclick="alert('Article coming soon!')">
+        <div class="article-thumb">🛡️</div>
+        <div class="article-info">
+          <h3>Top 5 Security Practices for 2026</h3>
+          <p>How to protect your cloud data and personal bins from unauthorized access in the modern web era.</p>
+        </div>
+      </div>
+
+      <div class="article-card" onclick="alert('Article coming soon!')">
+        <div class="article-thumb">🤖</div>
+        <div class="article-info">
+          <h3>The Evolution of AI Search</h3>
+          <p>Why modern hubs are replacing traditional search engines with integrated AI terminals.</p>
+        </div>
+      </div>
+    </div>
+    <footer>
+      <p>&copy; 2026 JOE HUB. All Rights Reserved.</p>
+      <div class="footer-links">
+        <a href="#" onclick="alert('Privacy Policy: We protect your data and use encrypted sessions.')">Privacy Policy</a> | 
+        <a href="#">Terms of Service</a>
+      </div>
+    </footer>
   </div>
-  <h1 class="brand">JOE HUB</h1>
-  <div class="operator-tag">OPERATOR: <span id="displayUser" style="color:var(--primary)">---</span></div>
-  <div class="search-box">
-    <input type="text" id="sIn" class="search-input" placeholder="Search Google or enter URL...">
-    <button class="search-btn" onclick="go()">SEARCH</button>
-  </div>
-  <div class="grid" id="mainGrid"></div>
-  <button class="logout-btn" onclick="logout()">TERMINAL LOGOUT</button>
 
   <script>
     const BIN_ID = '6958d60343b1c97be91604b3';
@@ -70,38 +131,35 @@
             const global = data.record;
 
             if(global.wallpaper) {
-                document.body.style.backgroundImage = `linear-gradient(rgba(15,18,32,0.8), rgba(15,18,32,0.8)), url('${global.wallpaper}')`;
+                document.body.style.backgroundImage = `linear-gradient(rgba(15,18,32,0.85), rgba(15,18,32,0.85)), url('${global.wallpaper}')`;
             }
             
             const grid = document.getElementById('mainGrid');
-            grid.innerHTML = '<a href="https://youtube.com" target="_blank" class="card">🎬<br><b>YouTube</b></a>';
+            grid.innerHTML = ''; // Clear and load
             global.links.forEach(l => {
                 const a = document.createElement('a'); a.className = 'card'; a.target = '_blank';
                 a.href = l.url.includes('http') ? l.url : 'https://' + l.url;
-                a.innerHTML = `🌐<br><b>${l.name}</b>`;
+                a.innerHTML = `<b>${l.name}</b>`;
                 grid.appendChild(a);
             });
             
-            // HIDE LOADER WHEN DONE
-            setTimeout(() => { document.getElementById('loader').style.opacity = '0'; setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500); }, 500);
+            setTimeout(() => { 
+                document.getElementById('loader').style.opacity = '0'; 
+                setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500); 
+            }, 800);
         } catch(e) { console.error("Cloud Connection Failed"); }
     }
 
     function go() {
       let val = document.getElementById('sIn').value;
       if(!val) return;
-      if(val.includes('.') && !val.startsWith('http')) val = 'https://' + val;
-      window.open(val.startsWith('http') ? val : 'https://google.com/search?q=' + encodeURIComponent(val), '_blank');
+      window.open('https://google.com/search?q=' + encodeURIComponent(val), '_blank');
     }
 
-    function logout() { localStorage.removeItem('userRole'); location.href = 'index.html'; }
-
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('displayUser').textContent = (localStorage.getItem('storedUsername') || 'Guest').toUpperCase();
       if(localStorage.getItem('userRole') === 'admin') document.getElementById('adminBtn').style.display = 'flex';
       loadHub();
     });
   </script>
 </body>
 </html>
-
