@@ -88,7 +88,7 @@
             </a>
         </div>
 
-        <button class="btn-main" onclick="document.getElementById('gate').style.display='flex'">LAUNCH TERMINAL</button>
+        <button class="btn-main" onclick="handleLogin('guest')">LAUNCH TERMINAL</button>
 
         <footer>
             <p>&copy; 2026 JOE HUB | <a href="about.html">About Us</a> | <a href="contact.html">Contact</a> | <a href="privacy.html">Privacy Policy</a></p>
@@ -108,7 +108,7 @@
 
     <div id="loader">
         <div class="orbit"><div class="dot3"></div></div>
-        <div class="ltxt">ACCESSING ENCRYPTED DATA...</div>
+        <div class="ltxt">DECRYPTING ARCHIVE FOR REVIEW...</div>
     </div>
 
     <script>
@@ -116,54 +116,19 @@
         const MASTER_KEY = '$2a$10$fBoN5/ymnTgk71qgkEb4XOeT4Ge23eShhEZzIbEqqVsZ67KQeev8S';
         const ADMIN_HASH = "2a42702b0ea9784979615db8283c6f128c9963f1a8f24ab174511bb0655c2e5c";
 
-        // CRAWLER BYPASS: Detects if the visitor is Google and ignores the gate
-        const isBot = /bot|google|baidu|bing|msn|duckduckbot|teoma|slurp|yandex/i.test(navigator.userAgent);
-        if (isBot) {
-            console.log("Welcome Google Crawler - Access Granted");
-        }
-
-        async function hash(string) {
-            const utf8 = new TextEncoder().encode(string);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        async function logVisitor(name) {
-            try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': MASTER_KEY } });
-                const data = await res.json();
-                const record = data.record;
-                if (!record.visitors) record.visitors = [];
-                record.visitors.push({ name: name, time: new Date().toLocaleString() });
-                if (record.visitors.length > 50) record.visitors.shift();
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                    method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': MASTER_KEY },
-                    body: JSON.stringify(record)
-                });
-            } catch(e) { console.log("Log fail"); }
-        }
-
         async function handleLogin(mode) {
-            const userField = document.getElementById('user');
-            const passField = document.getElementById('pass');
-            const user = userField.value.trim();
-            const pass = passField.value.trim();
-
-            if (user === "" && !isBot) { alert("Please enter a Username."); return; }
-
-            if (mode === 'admin' && !isBot) {
-                const inputHash = await hash(pass);
-                if (inputHash !== ADMIN_HASH) { alert('INCORRECT PASSWORD'); return; }
-            }
-
+            // --- GATE DEACTIVATED FOR GOOGLE REVIEW ---
             document.getElementById('gate').style.display = 'none';
             document.getElementById('content-layer').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
-
-            if(!isBot) await logVisitor(user + (mode === 'admin' ? " (ADMIN)" : ""));
-            localStorage.setItem('userRole', mode);
-            location.href = 'gemini.html'; // Changed to gemini.html to help crawler find content
+            
+            // Log as "REVIEWER" automatically
+            localStorage.setItem('userRole', 'guest');
+            localStorage.setItem('storedUsername', 'GoogleReviewer');
+            
+            setTimeout(() => {
+                location.href = 'gemini.html';
+            }, 1200);
         }
 
         function startMatrix() {
