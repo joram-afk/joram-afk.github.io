@@ -3,62 +3,28 @@
 <head>
     <meta name="google-adsense-account" content="ca-pub-2262359390313772">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2262359390313772" crossorigin="anonymous"></script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JOE HUB - Digital Resource Terminal</title>
     <style>
         :root { --primary: #00ff41; --bg: #000; }
         body { margin: 0; background: var(--bg); font-family: 'Segoe UI', sans-serif; color: white; overflow-x: hidden; }
-        canvas { display: block; position: fixed; top: 0; left: 0; z-index: 1; opacity: 0.6; }
-
-        /* CONTENT LAYER */
+        canvas { display: block; position: fixed; top: 0; left: 0; z-index: 1; opacity: 0.3; }
         #content-layer { position: relative; z-index: 10; max-width: 900px; margin: 0 auto; padding: 60px 20px; text-align: center; }
-        header { margin-bottom: 50px; }
         .logo { font-size: 3rem; font-weight: 900; color: var(--primary); letter-spacing: 10px; text-shadow: 0 0 20px var(--primary); }
         .tagline { opacity: 0.6; letter-spacing: 3px; font-size: 0.9rem; margin-top: 10px; }
-
-        /* PUBLIC ARTICLE FEED */
-        .article-feed { text-align: left; margin: 40px 0; }
-        .feed-title { font-size: 0.7rem; letter-spacing: 4px; opacity: 0.5; text-transform: uppercase; margin-bottom: 20px; border-bottom: 1px solid rgba(0,255,65,0.2); padding-bottom: 10px;}
-        .article-preview { background: rgba(11, 14, 26, 0.8); padding: 25px; border-radius: 12px; border-left: 3px solid var(--primary); margin-bottom: 20px; transition: 0.3s; cursor: pointer; display: block; text-decoration: none; color: white; }
-        .article-preview:hover { background: rgba(11, 14, 26, 1); transform: translateX(5px); }
-        .article-preview h4 { margin: 0 0 10px 0; color: var(--primary); }
-        .article-preview p { font-size: 0.9rem; opacity: 0.7; margin: 0; line-height: 1.5; }
-
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin: 50px 0; text-align: left; }
-        .info-card { background: rgba(11, 14, 26, 0.9); padding: 30px; border-radius: 15px; border: 1px solid rgba(0, 255, 65, 0.2); backdrop-filter: blur(10px); }
-        .info-card h3 { color: var(--primary); margin-bottom: 10px; font-size: 1.2rem; }
-        .info-card p { font-size: 0.9rem; line-height: 1.6; opacity: 0.8; }
-
-        .btn-main { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 15px 45px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.3s; box-shadow: 0 0 15px rgba(0,255,65,0.2); }
-        .btn-main:hover { background: var(--primary); color: black; box-shadow: 0 0 40px var(--primary); }
-
-        /* MODAL LOGIN BOX */
-        .login-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
-        .login-box { background: rgba(11, 14, 26, 0.95); padding: 40px; border: 1px solid var(--primary); border-radius: 15px; text-align: center; width: 320px; box-shadow: 0 0 30px rgba(0,255,65,0.3); }
-        h2 { color: var(--primary); margin-bottom: 25px; letter-spacing: 3px; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; border: 1px solid #333; color: var(--primary); border-radius: 8px; outline: none; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 8px; border: none; transition: 0.3s; margin-bottom: 10px; }
-        .primary-btn { background: var(--primary); color: #000; }
-        .guest-btn { background: transparent; color: #888; border: 1px solid #333; }
-
+        .info-card { background: rgba(11, 14, 26, 0.9); padding: 30px; border-radius: 15px; border: 1px solid rgba(0, 255, 65, 0.2); }
+        .info-card h3 { color: var(--primary); margin-bottom: 10px; }
+        .article-preview { background: rgba(11, 14, 26, 0.8); padding: 25px; border-radius: 12px; border-left: 3px solid var(--primary); margin-bottom: 20px; display: block; text-decoration: none; color: white; text-align: left; }
+        .btn-main { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 15px 45px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.3s; text-decoration: none; display: inline-block; }
+        .btn-main:hover { background: var(--primary); color: black; }
         footer { margin-top: 80px; padding: 30px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; opacity: 0.6; }
         footer a { color: var(--primary); text-decoration: none; margin: 0 10px; }
-
-        #loader { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1100; text-align: center; }
-        .orbit { width: 50px; height: 50px; position: relative; animation: spin 1s linear infinite; margin: 0 auto; }
-        .orbit::before, .orbit::after, .dot3 { content: ''; position: absolute; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; }
-        .orbit::before { top: 0; left: 50%; transform: translateX(-50%); }
-        .orbit::after { bottom: 0; left: 50%; transform: translateX(-50%); }
-        .dot3 { top: 50%; left: 0; transform: translateY(-50%); }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        .ltxt { color: var(--primary); margin-top: 15px; font-size: 10px; }
     </style>
 </head>
 <body>
     <canvas id="matrix"></canvas>
-
     <div id="content-layer">
         <header>
             <div class="logo">JOE HUB</div>
@@ -68,88 +34,46 @@
         <div class="info-grid">
             <div class="info-card">
                 <h3>Cloud Connectivity</h3>
-                <p>JOE HUB utilizes advanced API integration to provide real-time access to cloud-based data repositories and productivity links.</p>
+                <p>Advanced API integration for real-time access to cloud-based data repositories.</p>
             </div>
             <div class="info-card">
-                <h3>Secure Terminal</h3>
-                <p>Our infrastructure is built with security-first protocols, ensuring a clean and efficient workspace for modern digital operators.</p>
+                <h3>Security Protocols</h3>
+                <p>Infrastructure built with encrypted protocols for modern digital operators.</p>
             </div>
         </div>
 
-        <div class="article-feed">
-            <div class="feed-title">Latest Intelligence</div>
+        <div style="text-align: left; margin: 40px 0;">
+            <div style="font-size: 0.7rem; letter-spacing: 4px; opacity: 0.5; text-transform: uppercase; margin-bottom: 20px;">Featured Intelligence</div>
             <a href="gemini.html" class="article-preview">
                 <h4>The Impact of AI on Web Development in 2026</h4>
-                <p>Explore how generative models and orchestration are redefining the role of the modern developer...</p>
-            </a>
-            <a href="gemini.html" class="article-preview">
-                <h4>Navigating the 2026 Digital Ecosystem</h4>
-                <p>A comprehensive guide to managing secure resource terminals and protecting cloud-based assets...</p>
+                <p>How generative models are redefining the role of the modern developer...</p>
             </a>
         </div>
 
-        <button class="btn-main" onclick="handleLogin('guest')">LAUNCH TERMINAL</button>
+        <a href="gemini.html" class="btn-main">EXPLORE ARCHIVE</a>
 
         <footer>
             <p>&copy; 2026 JOE HUB | <a href="about.html">About Us</a> | <a href="contact.html">Contact</a> | <a href="privacy.html">Privacy Policy</a></p>
         </footer>
     </div>
 
-    <div class="login-overlay" id="gate">
-        <div class="login-box">
-            <h2>Access Portal</h2>
-            <input type="text" id="user" placeholder="Enter Username">
-            <input type="password" id="pass" placeholder="Admin Key">
-            <button class="btn primary-btn" onclick="handleLogin('admin')">ADMIN LOGIN</button>
-            <button class="btn guest-btn" onclick="handleLogin('guest')">GUEST ACCESS</button>
-            <p style="color:#444; margin-top:15px; font-size:12px; cursor:pointer;" onclick="document.getElementById('gate').style.display='none'">[ CLOSE GATE ]</p>
-        </div>
-    </div>
-
-    <div id="loader">
-        <div class="orbit"><div class="dot3"></div></div>
-        <div class="ltxt">DECRYPTING ARCHIVE FOR REVIEW...</div>
-    </div>
-
     <script>
-        const BIN_ID = '6958d60343b1c97be91604b3';
-        const MASTER_KEY = '$2a$10$fBoN5/ymnTgk71qgkEb4XOeT4Ge23eShhEZzIbEqqVsZ67KQeev8S';
-        const ADMIN_HASH = "2a42702b0ea9784979615db8283c6f128c9963f1a8f24ab174511bb0655c2e5c";
-
-        async function handleLogin(mode) {
-            // --- GATE DEACTIVATED FOR GOOGLE REVIEW ---
-            document.getElementById('gate').style.display = 'none';
-            document.getElementById('content-layer').style.display = 'none';
-            document.getElementById('loader').style.display = 'block';
-            
-            // Log as "REVIEWER" automatically
-            localStorage.setItem('userRole', 'guest');
-            localStorage.setItem('storedUsername', 'GoogleReviewer');
-            
-            setTimeout(() => {
-                location.href = 'gemini.html';
-            }, 1200);
-        }
-
-        function startMatrix() {
-            const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            const letters = "01010101CODEJOE"; const fontSize = 16;
-            const columns = canvas.width / fontSize; const drops = Array(Math.floor(columns)).fill(1);
-            function draw() {
-                ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "#00ff41"; ctx.font = fontSize + "px monospace";
-                for (let i = 0; i < drops.length; i++) {
-                    const text = letters[Math.floor(Math.random() * letters.length)];
-                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                    drops[i]++;
-                }
+        // MATRIX BACKGROUND
+        const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const letters = "01010101"; const fontSize = 16;
+        const columns = canvas.width / fontSize; const drops = Array(Math.floor(columns)).fill(1);
+        function draw() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#00ff41"; ctx.font = fontSize + "px monospace";
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters[Math.floor(Math.random() * letters.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
             }
-            setInterval(draw, 33);
         }
-        
-        window.onload = startMatrix;
+        setInterval(draw, 33);
     </script>
 </body>
 </html>
