@@ -10,65 +10,61 @@
     body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; overflow-x: hidden; }
 
     /* DASHBOARD LAYOUT */
-    .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; height: 95vh; }
     
-    /* HEADER / TOP BAR */
-    header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #333; margin-bottom: 40px; }
+    /* HEADER */
+    header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid #333; margin-bottom: 20px; }
     .brand { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; color: var(--primary); display: flex; align-items: center; gap: 10px; }
     .status-badge { font-size: 0.7rem; background: rgba(0, 255, 65, 0.1); border: 1px solid var(--primary); padding: 5px 10px; border-radius: 4px; color: var(--primary); }
 
-    /* SYSTEM METRICS BAR */
-    .metrics-bar { display: flex; gap: 20px; margin-bottom: 40px; flex-wrap: wrap; }
-    .metric { background: var(--card); padding: 15px 25px; border-radius: 8px; border-left: 2px solid var(--primary); flex: 1; min-width: 150px; }
-    .metric span { display: block; font-size: 0.8rem; opacity: 0.6; margin-bottom: 5px; }
-    .metric strong { font-size: 1.2rem; letter-spacing: 1px; }
+    /* SPLIT VIEW LAYOUT */
+    .main-interface { display: flex; gap: 20px; flex: 1; height: 100%; overflow: hidden; }
+    
+    /* SIDEBAR (BUTTONS) */
+    .sidebar { width: 300px; overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 15px; }
+    .sidebar::-webkit-scrollbar { width: 5px; }
+    .sidebar::-webkit-scrollbar-thumb { background: #333; border-radius: 5px; }
 
-    /* BUTTONS GRID (THE DASHBOARD) */
-    .section-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; opacity: 0.5; margin-bottom: 20px; display: block; }
+    /* VIEWPORT (IFRAME) */
+    .viewport-container { flex: 1; background: var(--card); border: 1px solid #333; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+    .viewport-header { background: #0f121a; padding: 10px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .url-display { font-family: monospace; color: var(--primary); font-size: 0.9rem; opacity: 0.8; }
+    .ext-btn { background: #222; color: white; border: 1px solid #444; padding: 5px 15px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; text-decoration: none; }
+    .ext-btn:hover { background: var(--primary); color: black; }
+
+    iframe { width: 100%; height: 100%; border: none; background: white; }
     
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-bottom: 60px; }
-    
+    /* BUTTON STYLES */
     .dash-btn { 
         background: var(--card); 
         border: 1px solid rgba(255, 255, 255, 0.05); 
-        padding: 25px; 
-        border-radius: 12px; 
-        text-decoration: none; 
+        padding: 15px; 
+        border-radius: 8px; 
+        cursor: pointer;
         color: white; 
-        transition: all 0.3s ease; 
-        position: relative; 
-        overflow: hidden; 
+        transition: all 0.2s ease; 
         display: flex;
-        flex-direction: column;
-        justify-content: center;
-        height: 120px;
+        align-items: center;
+        gap: 15px;
     }
-    
-    .dash-btn:hover { 
-        border-color: var(--primary); 
-        background: rgba(0, 255, 65, 0.05); 
-        transform: translateY(-5px); 
-        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-    }
+    .dash-btn:hover, .dash-btn.active { border-color: var(--primary); background: rgba(0, 255, 65, 0.05); transform: translateX(5px); }
+    .btn-icon { color: var(--primary); font-size: 1.2rem; }
+    .btn-name { font-weight: bold; font-size: 0.9rem; }
 
-    .btn-icon { font-size: 1.5rem; margin-bottom: 15px; color: var(--primary); opacity: 0.8; }
-    .btn-name { font-weight: bold; font-size: 1.1rem; letter-spacing: 0.5px; }
-    .active-dot { position: absolute; top: 15px; right: 15px; width: 8px; height: 8px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); }
-
-    /* CONTENT FEED (For AdSense Value) */
-    .content-feed { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-    .article-card { background: var(--card); border-radius: 12px; padding: 30px; border-top: 3px solid #333; }
-    .article-card h3 { color: var(--primary); margin-top: 0; }
-    .article-card p { opacity: 0.7; line-height: 1.6; font-size: 0.95rem; }
-    .tag { font-size: 0.7rem; background: #222; padding: 4px 8px; border-radius: 4px; color: #aaa; }
+    /* PLACEHOLDER STATE */
+    .empty-state { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #444; }
+    .empty-icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
 
     /* LOADER */
     #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
     .spinner { width: 40px; height: 40px; border: 3px solid rgba(0,255,65,0.3); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    footer { margin-top: 80px; padding: 40px 0; border-top: 1px solid #222; text-align: center; opacity: 0.5; font-size: 0.9rem; }
-    footer a { color: white; margin: 0 10px; text-decoration: none; }
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .main-interface { flex-direction: column; }
+        .sidebar { width: 100%; height: 200px; }
+    }
   </style>
 </head>
 <body>
@@ -79,77 +75,40 @@
     <header>
       <div class="brand">
         <span>JOE HUB</span>
-        <span class="status-badge">ONLINE</span>
+        <span class="status-badge">COMMAND CENTER</span>
       </div>
       <div id="clock" style="font-family: monospace; opacity: 0.7;">00:00:00</div>
     </header>
 
-    <div class="metrics-bar">
-      <div class="metric">
-        <span>SYSTEM STATUS</span>
-        <strong style="color: var(--primary)">OPERATIONAL</strong>
-      </div>
-      <div class="metric">
-        <span>SECURITY LEVEL</span>
-        <strong>ENCRYPTED (TLS 1.3)</strong>
-      </div>
-      <div class="metric">
-        <span>DATABASE</span>
-        <strong>CONNECTED</strong>
+    <div class="main-interface">
+      <div class="sidebar" id="sidebarList">
+        </div>
+
+      <div class="viewport-container">
+        <div class="viewport-header">
+          <span class="url-display" id="currentUrl">READY TO EXECUTE</span>
+          <a href="#" target="_blank" id="extLink" class="ext-btn">OPEN IN NEW TAB ↗</a>
+        </div>
+        
+        <iframe id="mainFrame" name="viewer"></iframe>
+        
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">⚡</div>
+          <h3>SELECT A MODULE</h3>
+          <p>Choose a resource from the sidebar to load it here.</p>
+        </div>
       </div>
     </div>
-
-    <span class="section-label">Command Modules (Active Links)</span>
-    <div class="grid" id="mainGrid">
-      </div>
-
-    <span class="section-label">Intelligence Reports</span>
-    <div class="content-feed">
-      
-      <div class="article-card">
-        <span class="tag">CLOUD INFRASTRUCTURE</span>
-        <h3>Edge Computing Optimization</h3>
-        <p>Analyzing the shift from centralized data centers to edge nodes. In 2026, latency reduction is the primary goal for web applications. By caching data closer to the user, we reduce load times by up to 40%.</p>
-      </div>
-
-      <div class="article-card">
-        <span class="tag">AI INTEGRATION</span>
-        <h3>Large Language Models in DevOps</h3>
-        <p>How LLMs are automating deployment pipelines. The modern developer is now an orchestrator of AI agents, using prompt engineering to manage server scaling and error logging in real-time.</p>
-      </div>
-
-      <div class="article-card">
-        <span class="tag">CYBERSECURITY</span>
-        <h3>Zero-Trust Architecture</h3>
-        <p>The "trust no one" approach to network security. We explore why verifying every request, regardless of origin, is standard practice for securing personal resource hubs and API endpoints.</p>
-      </div>
-
-      <div class="article-card">
-        <span class="tag">DATA ETHICS</span>
-        <h3>The Future of Data Sovereignty</h3>
-        <p>As big data grows, user ownership becomes critical. Platforms must now prioritize transparent data policies and give users absolute control over their digital footprint and exportable data.</p>
-      </div>
-
-    </div>
-
-    <footer>
-      <p>&copy; 2026 JOE HUB System.</p>
-      <p><a href="privacy.html">Privacy Policy</a> • <a href="contact.html">Contact Support</a></p>
-    </footer>
   </div>
 
   <script>
     const BIN_ID = '6958d60343b1c97be91604b3';
     const MASTER_KEY = '$2a$10$fBoN5/ymnTgk71qgkEb4XOeT4Ge23eShhEZzIbEqqVsZ67KQeev8S';
 
-    // FALLBACK LINKS (Safety Net: If database fails, these load so site isn't empty)
     const fallbackLinks = [
         { name: "Google Cloud", url: "https://console.cloud.google.com" },
-        { name: "GitHub Repos", url: "https://github.com" },
-        { name: "StackOverflow", url: "https://stackoverflow.com" },
-        { name: "Dev Resources", url: "https://dev.to" },
-        { name: "System Admin", url: "#" },
-        { name: "Network Tools", url: "#" }
+        { name: "Wikipedia (Test)", url: "https://en.wikipedia.org/wiki/Main_Page" }, // Wikipedia usually works in iframes
+        { name: "Bing Search", url: "https://www.bing.com" }
     ];
 
     function updateClock() {
@@ -159,50 +118,60 @@
     setInterval(updateClock, 1000);
 
     async function loadDashboard() {
-        const grid = document.getElementById('mainGrid');
-        
         try {
-            // Attempt to fetch from JSONBin
             const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { 
                 headers: { 'X-Master-Key': MASTER_KEY } 
             });
-            
             if (!res.ok) throw new Error("Database fetch failed");
-            
             const data = await res.json();
-            const links = data.record.links || fallbackLinks; // Use fallback if record is empty
-            renderGrid(links);
-
+            const links = data.record.links || fallbackLinks;
+            renderSidebar(links);
         } catch(e) { 
             console.log("Loading fallback mode...");
-            renderGrid(fallbackLinks); 
+            renderSidebar(fallbackLinks); 
         }
 
-        // Hide Loader
         setTimeout(() => {
             document.getElementById('loader').style.opacity = '0';
             setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
         }, 800);
     }
 
-    function renderGrid(links) {
-        const grid = document.getElementById('mainGrid');
-        grid.innerHTML = '';
+    function renderSidebar(links) {
+        const sidebar = document.getElementById('sidebarList');
+        sidebar.innerHTML = '';
         
         links.forEach(link => {
-            const a = document.createElement('a');
-            a.className = 'dash-btn';
-            a.href = link.url.includes('http') ? link.url : 'https://' + link.url;
-            a.target = '_blank';
+            const div = document.createElement('div');
+            div.className = 'dash-btn';
             
-            // Create the card content
-            a.innerHTML = `
-                <div class="active-dot"></div>
-                <div class="btn-icon">⚡</div>
+            // Clean URL
+            let fullUrl = link.url.includes('http') ? link.url : 'https://' + link.url;
+            
+            div.onclick = () => loadUrl(fullUrl, link.name, div);
+            
+            div.innerHTML = `
+                <div class="btn-icon">➜</div>
                 <div class="btn-name">${link.name}</div>
             `;
-            grid.appendChild(a);
+            sidebar.appendChild(div);
         });
+    }
+
+    function loadUrl(url, name, btnElement) {
+        // Highlight active button
+        document.querySelectorAll('.dash-btn').forEach(b => b.classList.remove('active'));
+        btnElement.classList.add('active');
+
+        // Hide empty state
+        document.getElementById('emptyState').style.display = 'none';
+        
+        // Update Iframe
+        document.getElementById('mainFrame').src = url;
+        
+        // Update Header Info
+        document.getElementById('currentUrl').textContent = `RUNNING: ${name.toUpperCase()}`;
+        document.getElementById('extLink').href = url;
     }
 
     window.onload = loadDashboard;
