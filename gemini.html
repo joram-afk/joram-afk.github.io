@@ -4,173 +4,177 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2262359390313772" crossorigin="anonymous"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JOE HUB - Global Command Center</title>
+  <title>JOE HUB - Enterprise Dashboard</title>
   <style>
     :root { --primary: #00ff41; --bg: #0b0e14; --card: #151a25; --text: #e0e6ed; --header-bg: #1a1f2b; }
-    body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; overflow-x: hidden; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; height: 100vh; overflow: hidden; }
 
-    .dashboard-container { max-width: 1600px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; height: 98vh; }
+    .dashboard-container { display: flex; flex-direction: column; height: 100vh; padding: 15px; box-sizing: border-box; }
     
-    header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid #333; }
-    .brand { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; color: var(--primary); display: flex; align-items: center; gap: 10px; }
-    .status-badge { font-size: 0.7rem; background: rgba(0, 255, 65, 0.1); border: 1px solid var(--primary); padding: 5px 10px; border-radius: 4px; color: var(--primary); }
+    header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid #333; }
+    .brand { font-size: 1.3rem; font-weight: 900; color: var(--primary); letter-spacing: 2px; }
 
-    .main-interface { display: flex; gap: 20px; flex: 1; height: 100%; overflow: hidden; margin-top: 20px; }
+    .main-interface { display: flex; gap: 15px; flex: 1; overflow: hidden; margin-top: 15px; }
     
     /* SIDEBAR */
-    .sidebar { width: 350px; display: flex; flex-direction: column; gap: 10px; border-right: 1px solid #222; padding-right: 15px; }
-    .search-wrapper { position: sticky; top: 0; background: var(--bg); z-index: 20; padding-bottom: 10px; }
-    .sidebar-search { width: 100%; background: #0f121a; border: 1px solid #333; color: var(--primary); padding: 12px; border-radius: 6px; outline: none; font-family: monospace; box-sizing: border-box; }
+    .sidebar { width: 320px; display: flex; flex-direction: column; border-right: 1px solid #222; }
+    .search-wrapper { padding-bottom: 10px; }
+    .sidebar-search { width: 100%; background: #0f121a; border: 1px solid #333; color: var(--primary); padding: 10px; border-radius: 4px; outline: none; font-family: monospace; }
 
-    .btn-list { overflow-y: auto; flex: 1; padding-right: 5px; }
-    .btn-list::-webkit-scrollbar { width: 4px; }
-    .btn-list::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+    .btn-list { overflow-y: auto; flex: 1; padding-right: 8px; }
+    .btn-list::-webkit-scrollbar { width: 3px; }
+    .btn-list::-webkit-scrollbar-thumb { background: var(--primary); }
 
-    /* CATEGORY HEADERS */
     .cat-header { 
-        background: var(--header-bg); 
-        color: var(--primary); 
-        padding: 8px 12px; 
-        font-size: 0.7rem; 
-        font-weight: 800; 
-        letter-spacing: 1.5px; 
-        text-transform: uppercase; 
-        margin-top: 20px; 
-        margin-bottom: 8px; 
-        border-radius: 4px;
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        border-left: 3px solid var(--primary);
+        background: var(--header-bg); color: var(--primary); padding: 6px 10px; 
+        font-size: 0.65rem; font-weight: 800; text-transform: uppercase; 
+        margin: 15px 0 5px 0; border-radius: 2px; position: sticky; top: 0;
     }
-    .cat-header:first-child { margin-top: 0; }
 
-    /* BUTTONS */
     .dash-btn { 
-        background: var(--card); border: 1px solid rgba(255, 255, 255, 0.05); 
-        padding: 12px; border-radius: 6px; cursor: pointer; color: white; 
-        display: flex; align-items: center; gap: 12px; transition: 0.2s;
-        margin-bottom: 6px;
+        background: var(--card); border: 1px solid rgba(255,255,255,0.05); 
+        padding: 10px; border-radius: 4px; cursor: pointer; color: #ccc; 
+        display: flex; align-items: center; gap: 10px; transition: 0.2s; margin-bottom: 4px; font-size: 0.85rem;
     }
-    .dash-btn:hover, .dash-btn.active { border-color: var(--primary); background: rgba(0, 255, 65, 0.05); transform: translateX(5px); }
-    .btn-icon { font-size: 1rem; width: 20px; text-align: center; }
-    .btn-name { font-size: 0.85rem; font-weight: 600; }
+    .dash-btn:hover, .dash-btn.active { border-color: var(--primary); color: white; background: rgba(0, 255, 65, 0.05); }
+
+    /* CONSOLE LOG */
+    #console-out { height: 80px; background: #000; border: 1px solid #222; margin-top: 10px; padding: 10px; font-family: monospace; font-size: 0.7rem; color: #008800; overflow-y: auto; }
 
     /* VIEWPORT */
-    .viewport-container { flex: 1; background: var(--card); border: 1px solid #333; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-    .viewport-header { background: #0f121a; padding: 10px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-    .url-display { font-family: monospace; color: var(--primary); font-size: 0.8rem; }
-    .ext-btn { background: #222; color: white; border: 1px solid #444; padding: 5px 12px; border-radius: 4px; text-decoration: none; font-size: 0.7rem; }
-
+    .viewport-container { flex: 1; background: var(--card); border: 1px solid #333; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; }
+    .viewport-header { background: #0f121a; padding: 8px 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
     iframe { width: 100%; height: 100%; border: none; background: white; }
-    .empty-state { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0.3; pointer-events: none; }
-
+    
     #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 999; display: flex; align-items: center; justify-content: center; }
-    .spinner { width: 40px; height: 40px; border: 3px solid rgba(0,255,65,0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; }
-    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-  <div id="loader"><div class="spinner"></div></div>
+  <div id="loader"><div style="color:var(--primary); font-family:monospace;">INITIALIZING SYSTEM...</div></div>
 
   <div class="dashboard-container">
     <header>
-      <div class="brand">JOE HUB <span class="status-badge">GLOBAL TERMINAL</span></div>
+      <div class="brand">JOE HUB // CORE</div>
       <div id="clock" style="font-family: monospace; opacity: 0.5;">00:00:00</div>
     </header>
 
     <div class="main-interface">
       <div class="sidebar">
         <div class="search-wrapper">
-            <input type="text" id="dashSearch" class="sidebar-search" placeholder="SEARCH ALL MODULES..." onkeyup="filterSidebar()">
+            <input type="text" id="dashSearch" class="sidebar-search" placeholder="CMD> SEARCH_MODULES..." onkeyup="filterSidebar()">
         </div>
         <div id="sidebarList" class="btn-list"></div>
+        <div id="console-out">> System ready...</div>
       </div>
 
       <div class="viewport-container">
         <div class="viewport-header">
-          <span class="url-display" id="currentUrl">SYSTEM IDLE - SELECT MODULE</span>
-          <a href="#" target="_blank" id="extLink" class="ext-btn">EXTERNAL LINK ↗</a>
+          <span id="currentUrl" style="color:var(--primary); font-size:0.7rem; font-family:monospace;">IDLE</span>
+          <a href="#" target="_blank" id="extLink" style="color:white; text-decoration:none; font-size:0.7rem;">OPEN_EXT ↗</a>
         </div>
         <iframe id="mainFrame" name="viewer"></iframe>
-        <div class="empty-state" id="emptyState">
-          <h2>DATABASE LOADED</h2>
-          <p>Global Resources Categorized and Ready</p>
-        </div>
       </div>
     </div>
   </div>
 
   <script>
     const registry = [
-        { name: "AWS Console", url: "console.aws.amazon.com", cat: "Cloud Infrastructure", ico: "☁️" },
-        { name: "Azure Portal", url: "portal.azure.com", cat: "Cloud Infrastructure", ico: "🔷" },
-        { name: "Google Cloud", url: "console.cloud.google.com", cat: "Cloud Infrastructure", ico: "🌐" },
-        { name: "DigitalOcean", url: "cloud.digitalocean.com", cat: "Cloud Infrastructure", ico: "🌊" },
-        { name: "ChatGPT", url: "chat.openai.com", cat: "Artificial Intelligence", ico: "🤖" },
-        { name: "Claude AI", url: "claude.ai", cat: "Artificial Intelligence", ico: "🧠" },
-        { name: "Gemini AI", url: "gemini.google.com", cat: "Artificial Intelligence", ico: "✨" },
+        // INFRASTRUCTURE
+        { name: "AWS Console", url: "console.aws.amazon.com", cat: "Infrastructure", ico: "☁️" },
+        { name: "Google Cloud", url: "console.cloud.google.com", cat: "Infrastructure", ico: "🌐" },
+        { name: "Azure Portal", url: "portal.azure.com", cat: "Infrastructure", ico: "🔷" },
+        { name: "DigitalOcean", url: "cloud.digitalocean.com", cat: "Infrastructure", ico: "🌊" },
+        { name: "Vercel", url: "vercel.com", cat: "Infrastructure", ico: "▲" },
+        { name: "Netlify", url: "netlify.com", cat: "Infrastructure", ico: "◈" },
+        { name: "Cloudflare", url: "dash.cloudflare.com", cat: "Infrastructure", ico: "🧡" },
+        // AI
+        { name: "ChatGPT", url: "chat.openai.com", cat: "AI & Neural", ico: "🤖" },
+        { name: "Claude AI", url: "claude.ai", cat: "AI & Neural", ico: "🧠" },
+        { name: "Gemini", url: "gemini.google.com", cat: "AI & Neural", ico: "✨" },
+        { name: "Perplexity", url: "perplexity.ai", cat: "AI & Neural", ico: "🔮" },
+        { name: "HuggingFace", url: "huggingface.co", cat: "AI & Neural", ico: "🤗" },
+        { name: "Midjourney", url: "midjourney.com", cat: "AI & Neural", ico: "🎨" },
+        { name: "DeepL", url: "deepl.com", cat: "AI & Neural", ico: "🌍" },
+        // CYBER SECURITY
         { name: "VirusTotal", url: "virustotal.com", cat: "Cyber Security", ico: "🛡️" },
         { name: "Shodan", url: "shodan.io", cat: "Cyber Security", ico: "🔍" },
-        { name: "GitHub", url: "github.com", cat: "Development Tools", ico: "🐙" },
-        { name: "Stack Overflow", url: "stackoverflow.com", cat: "Development Tools", ico: "📚" },
-        { name: "Binance", url: "binance.com", cat: "Finance & Crypto", ico: "💰" },
-        { name: "TradingView", url: "tradingview.com", cat: "Finance & Crypto", ico: "📉" },
-        { name: "Slack", url: "slack.com", cat: "Enterprise Workspace", ico: "💬" },
-        { name: "Notion", url: "notion.so", cat: "Enterprise Workspace", ico: "📝" },
-        { name: "YouTube", url: "youtube.com", cat: "Social & Media", ico: "▶️" },
-        { name: "Reddit", url: "reddit.com", cat: "Social & Media", ico: "👾" }
+        { name: "HaveIBeenPwned", url: "haveibeenpwned.com", cat: "Cyber Security", ico: "🔐" },
+        { name: "Kali Tools", url: "kali.org/tools", cat: "Cyber Security", ico: "🐉" },
+        { name: "Exploit-DB", url: "exploit-db.com", cat: "Cyber Security", ico: "💥" },
+        { name: "Tenable", url: "tenable.com", cat: "Cyber Security", ico: "🎯" },
+        { name: "Burp Suite", url: "portswigger.net", cat: "Cyber Security", ico: "🍖" },
+        // DEVELOPER
+        { name: "GitHub", url: "github.com", cat: "Development", ico: "🐙" },
+        { name: "Stack Overflow", url: "stackoverflow.com", cat: "Development", ico: "📚" },
+        { name: "NPM Registry", url: "npmjs.com", cat: "Development", ico: "📦" },
+        { name: "MDN Docs", url: "developer.mozilla.org", cat: "Development", ico: "🦊" },
+        { name: "CodePen", url: "codepen.io", cat: "Development", ico: "✒️" },
+        { name: "Dev.to", url: "dev.to", cat: "Development", ico: "👩‍💻" },
+        { name: "W3Schools", url: "w3schools.com", cat: "Development", ico: "🎓" },
+        // FINANCE
+        { name: "TradingView", url: "tradingview.com", cat: "Finance", ico: "📉" },
+        { name: "Binance", url: "binance.com", cat: "Finance", ico: "💰" },
+        { name: "CoinMarketCap", url: "coinmarketcap.com", cat: "Finance", ico: "📈" },
+        { name: "Stripe", url: "stripe.com", cat: "Finance", ico: "💳" },
+        { name: "PayPal", url: "paypal.com", cat: "Finance", ico: "🅿️" },
+        { name: "Robinhood", url: "robinhood.com", cat: "Finance", ico: "🏹" },
+        // SOCIAL/OSINT
+        { name: "Reddit", url: "reddit.com", cat: "Social & OSINT", ico: "👾" },
+        { name: "X / Twitter", url: "x.com", cat: "Social & OSINT", ico: "🐦" },
+        { name: "LinkedIn", url: "linkedin.com", cat: "Social & OSINT", ico: "💼" },
+        { name: "Archive.org", url: "archive.org", cat: "Social & OSINT", ico: "🏛️" },
+        { name: "Who.is", url: "who.is", cat: "Social & OSINT", ico: "🆔" },
+        { name: "Crunchbase", url: "crunchbase.com", cat: "Social & OSINT", ico: "📊" },
+        // TOOLS
+        { name: "Notion", url: "notion.so", cat: "Productivity", ico: "📝" },
+        { name: "Trello", url: "trello.com", cat: "Productivity", ico: "📋" },
+        { name: "Slack", url: "slack.com", cat: "Productivity", ico: "💬" },
+        { name: "Canva", url: "canva.com", cat: "Productivity", ico: "🎨" },
+        { name: "Figma", url: "figma.com", cat: "Productivity", ico: "💠" }
     ];
 
-    async function init() {
-        renderSidebar(registry);
-        setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleTimeString(); }, 1000);
-        setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 800);
+    function log(msg) {
+        const con = document.getElementById('console-out');
+        con.innerHTML += `<br>> ${msg}`;
+        con.scrollTop = con.scrollHeight;
     }
 
     function renderSidebar(items) {
         const list = document.getElementById('sidebarList');
         list.innerHTML = '';
-        
-        // Group items by category
-        const grouped = items.reduce((acc, item) => {
-            (acc[item.cat] = acc[item.cat] || []).push(item);
-            return acc;
-        }, {});
+        const grouped = items.reduce((acc, i) => { (acc[i.cat] = acc[i.cat] || []).push(i); return acc; }, {});
 
-        // Render each category and its items
-        for (const category in grouped) {
-            const header = document.createElement('div');
-            header.className = 'cat-header';
-            header.textContent = category;
-            list.appendChild(header);
-
-            grouped[category].forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'dash-btn';
-                div.onclick = () => {
+        for (const cat in grouped) {
+            const h = document.createElement('div'); h.className = 'cat-header'; h.textContent = cat;
+            list.appendChild(h);
+            grouped[cat].forEach(item => {
+                const d = document.createElement('div'); d.className = 'dash-btn';
+                d.onclick = () => {
                     const url = item.url.includes('http') ? item.url : 'https://' + item.url;
                     document.getElementById('mainFrame').src = url;
-                    document.getElementById('currentUrl').textContent = `RUNNING: ${item.name.toUpperCase()}`;
+                    document.getElementById('currentUrl').textContent = `EXEC: ${item.name.toUpperCase()}`;
                     document.getElementById('extLink').href = url;
-                    document.getElementById('emptyState').style.display = 'none';
+                    log(`Connecting to ${item.name}... Done.`);
                     document.querySelectorAll('.dash-btn').forEach(b => b.classList.remove('active'));
-                    div.classList.add('active');
+                    d.classList.add('active');
                 };
-                div.innerHTML = `<span class="btn-icon">${item.ico}</span><span class="btn-name">${item.name}</span>`;
-                list.appendChild(div);
+                d.innerHTML = `<span>${item.ico}</span><span>${item.name}</span>`;
+                list.appendChild(d);
             });
         }
     }
 
     function filterSidebar() {
-        const query = document.getElementById('dashSearch').value.toLowerCase();
-        const filtered = registry.filter(i => i.name.toLowerCase().includes(query) || i.cat.toLowerCase().includes(query));
-        renderSidebar(filtered);
+        const q = document.getElementById('dashSearch').value.toLowerCase();
+        renderSidebar(registry.filter(i => i.name.toLowerCase().includes(q) || i.cat.toLowerCase().includes(q)));
     }
 
-    window.onload = init;
+    window.onload = () => {
+        renderSidebar(registry);
+        setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleTimeString(); }, 1000);
+        setTimeout(() => document.getElementById('loader').style.display = 'none', 1000);
+    };
   </script>
 </body>
 </html>
