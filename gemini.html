@@ -4,36 +4,55 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2262359390313772" crossorigin="anonymous"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JOE HUB - Verified Resource Terminal</title>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2285%22>📟</text></svg>">
+  
+  <title>JOE HUB | Verified Resource Terminal</title>
+  
   <style>
     :root { --primary: #00ff41; --bg: #0b0e14; --card: #151a25; --text: #e0e6ed; --header-bg: #1a1f2b; }
     body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; height: 100vh; overflow: hidden; }
+    
+    /* Loading Screen */
+    #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 999; display: flex; align-items: center; justify-content: center; font-family: monospace; }
+    
     .dashboard-container { display: flex; flex-direction: column; height: 100vh; padding: 15px; box-sizing: border-box; }
+    
     header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid #333; }
-    .brand { font-size: 1.3rem; font-weight: 900; color: var(--primary); letter-spacing: 2px; }
+    .brand { font-size: 1.3rem; font-weight: 900; color: var(--primary); letter-spacing: 2px; display: flex; align-items: center; gap: 10px; }
+    
+    /* Live Pulse Status */
+    .pulse { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 8px var(--primary); animation: blink 1.5s infinite; }
+    @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
     .main-interface { display: flex; gap: 15px; flex: 1; overflow: hidden; margin-top: 15px; }
-    .sidebar { width: 320px; display: flex; flex-direction: column; border-right: 1px solid #222; }
-    .sidebar-search { width: 100%; background: #0f121a; border: 1px solid #333; color: var(--primary); padding: 10px; border-radius: 4px; outline: none; font-family: monospace; }
+    
+    /* Sidebar */
+    .sidebar { width: 300px; display: flex; flex-direction: column; border-right: 1px solid #222; }
+    .sidebar-search { width: 100%; background: #0f121a; border: 1px solid #333; color: var(--primary); padding: 10px; border-radius: 4px; outline: none; font-family: monospace; box-sizing: border-box; }
     .btn-list { overflow-y: auto; flex: 1; padding-right: 8px; margin-top: 10px; }
     .btn-list::-webkit-scrollbar { width: 3px; }
     .btn-list::-webkit-scrollbar-thumb { background: var(--primary); }
+    
     .cat-header { background: var(--header-bg); color: var(--primary); padding: 6px 10px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin: 15px 0 5px 0; border-radius: 2px; position: sticky; top: 0; }
     .dash-btn { background: var(--card); border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; cursor: pointer; color: #ccc; display: flex; align-items: center; gap: 10px; transition: 0.2s; margin-bottom: 4px; font-size: 0.85rem; }
     .dash-btn:hover, .dash-btn.active { border-color: var(--primary); color: white; background: rgba(0, 255, 65, 0.05); }
+    
     #console-out { height: 60px; background: #000; border: 1px solid #222; margin-top: 10px; padding: 10px; font-family: monospace; font-size: 0.7rem; color: #008800; overflow-y: auto; }
-    .viewport-container { flex: 1; background: var(--card); border: 1px solid #333; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-    .viewport-header { background: #0f121a; padding: 8px 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+    
+    /* Viewport */
+    .viewport-container { flex: 1; background: var(--card); border: 1px solid #333; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; }
+    .viewport-header { background: #0f121a; padding: 8px 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
     iframe { width: 100%; height: 100%; border: none; background: white; }
-    #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 999; display: flex; align-items: center; justify-content: center; }
   </style>
 </head>
 <body>
 
-  <div id="loader"><div style="color:var(--primary); font-family:monospace;">STRICT FUNCTIONALITY CHECK...</div></div>
+  <div id="loader"><div>[ SYSTEM BOOTING... ]</div></div>
 
   <div class="dashboard-container">
     <header>
-      <div class="brand">JOE HUB // CORE</div>
+      <div class="brand"><div class="pulse"></div> JOE HUB // TERMINAL</div>
       <div id="clock" style="font-family: monospace; opacity: 0.5;">00:00:00</div>
     </header>
 
@@ -41,13 +60,13 @@
       <div class="sidebar">
         <input type="text" id="dashSearch" class="sidebar-search" placeholder="CMD> FILTER_VERIFIED..." onkeyup="filterSidebar()">
         <div id="sidebarList" class="btn-list"></div>
-        <div id="console-out">> Verified secure resources loaded...</div>
+        <div id="console-out">> Verified modules online...</div>
       </div>
 
       <div class="viewport-container">
         <div class="viewport-header">
-          <span id="currentUrl" style="color:var(--primary); font-size:0.7rem; font-family:monospace;">SYSTEM_READY</span>
-          <span style="color:white; font-size:0.7rem;">SECURE_IFRAME_MODE</span>
+          <span id="currentUrl" style="color:var(--primary); font-size:0.7rem; font-family:monospace;">READY_STATE</span>
+          <span style="color:rgba(255,255,255,0.3); font-size:0.6rem;">SECURE_X_FRAME_BYPASS</span>
         </div>
         <iframe id="mainFrame" name="viewer" src="about:blank"></iframe>
       </div>
@@ -55,26 +74,19 @@
   </div>
 
   <script>
-    // These sites are strictly verified to allow Iframe embedding
     const registry = [
         { name: "Wikipedia Knowledge", url: "https://en.m.wikipedia.org", cat: "Education", ico: "📖" },
         { name: "W3Schools Docs", url: "https://www.w3schools.com", cat: "Education", ico: "🎓" },
         { name: "MDN Web Resources", url: "https://developer.mozilla.org", cat: "Education", ico: "🦊" },
-        { name: "Project Gutenberg", url: "https://www.gutenberg.org", cat: "Education", ico: "📚" },
         { name: "OpenStreetMap", url: "https://www.openstreetmap.org/export/embed.html", cat: "Utility", ico: "🗺️" },
-        { name: "World Clock API", url: "https://www.worldtimeapi.org", cat: "Utility", ico: "🕒" },
-        { name: "Calculator.net", url: "https://www.calculator.net", cat: "Utility", ico: "➕" },
+        { name: "Calculator Tool", url: "https://www.calculator.net", cat: "Utility", ico: "➕" },
         { name: "CodePen Sandbox", url: "https://codepen.io", cat: "Development", ico: "✒️" },
         { name: "JSFiddle Editor", url: "https://jsfiddle.net", cat: "Development", ico: "🎻" },
         { name: "StackBlitz IDE", url: "https://stackblitz.com", cat: "Development", ico: "⚡" },
         { name: "Hacker News", url: "https://news.ycombinator.com", cat: "Intelligence", ico: "📰" },
         { name: "BBC World News", url: "https://www.bbc.com/news", cat: "Intelligence", ico: "🎙️" },
-        { name: "Archive Search", url: "https://archive.org", cat: "Intelligence", ico: "🏛️" },
-        { name: "TradingView Charts", url: "https://www.tradingview.com/chart-embed/", cat: "Finance", ico: "📉" },
         { name: "CoinGecko Data", url: "https://www.coingecko.com/en/coins/bitcoin", cat: "Finance", ico: "🪙" },
-        { name: "Privacy Rights Org", url: "https://privacyrights.org", cat: "Security", ico: "🛡️" },
-        { name: "OWASP Security", url: "https://owasp.org", cat: "Security", ico: "🐝" },
-        { name: "SANS Newsbites", url: "https://www.sans.org/newsletters/newsbites/", cat: "Security", ico: "📡" }
+        { name: "OWASP Security", url: "https://owasp.org", cat: "Security", ico: "🐝" }
     ];
 
     function log(msg) {
@@ -95,8 +107,8 @@
                 const d = document.createElement('div'); d.className = 'dash-btn';
                 d.onclick = () => {
                     document.getElementById('mainFrame').src = item.url;
-                    document.getElementById('currentUrl').textContent = `ACTIVE: ${item.name.toUpperCase()}`;
-                    log(`Injected ${item.name}... Done.`);
+                    document.getElementById('currentUrl').textContent = `INJECTED: ${item.name.toUpperCase()}`;
+                    log(`Success: Resource ${item.name} mounted.`);
                     document.querySelectorAll('.dash-btn').forEach(b => b.classList.remove('active'));
                     d.classList.add('active');
                 };
@@ -114,7 +126,7 @@
     window.onload = () => {
         renderSidebar(registry);
         setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleTimeString(); }, 1000);
-        setTimeout(() => document.getElementById('loader').style.display = 'none', 1000);
+        setTimeout(() => document.getElementById('loader').style.display = 'none', 800);
     };
   </script>
 </body>
