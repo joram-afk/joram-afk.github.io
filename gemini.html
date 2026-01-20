@@ -2,118 +2,178 @@
 <html lang="en">
 <head>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2262359390313772" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2285%22>🇰🇪</text></svg>">
-  <title>JOE HUB | Kenya Digital Utility & Data Saver</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2285%22>💸</text></svg>">
+  <title>JOE HUB | Kenyan Biashara Toolkit</title>
   <style>
-    :root { --primary: #00ff41; --bg: #0b0e14; --card: #151a25; --text: #e0e6ed; }
-    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-    
-    .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1200px; margin: 0 auto; }
-    
-    .card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 12px; }
-    .card h2 { color: var(--primary); margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
-    
-    /* TOOL: DATA CALCULATOR */
-    .calc-row { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center; }
-    input { background: #000; border: 1px solid var(--primary); color: var(--primary); padding: 8px; width: 80px; border-radius: 4px; }
-    .result-box { background: rgba(0, 255, 65, 0.1); padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 1.2rem; border: 1px dashed var(--primary); }
+    :root { --primary: #00D366; --secondary: #FFD700; --bg: #090c10; --card: #161b22; --text: #f0f6fc; }
+    body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; box-sizing: border-box; }
 
-    /* TOOL: USSD CODES TABLE */
-    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #222; }
-    th { color: var(--primary); }
+    /* LAYOUT */
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto; }
+    
+    header { text-align: center; margin-bottom: 40px; border-bottom: 1px solid #333; padding-bottom: 20px; }
+    h1 { margin: 0; font-weight: 900; letter-spacing: 1px; color: white; }
+    h1 span { color: var(--primary); }
+    .subtitle { color: #8b949e; font-size: 0.9rem; margin-top: 5px; }
 
-    /* DASHBOARD MINI */
-    .mini-dash { display: flex; flex-direction: column; gap: 10px; }
-    .dash-link { background: #1e2533; padding: 12px; border-radius: 6px; text-decoration: none; color: white; display: flex; justify-content: space-between; transition: 0.3s; }
-    .dash-link:hover { background: var(--primary); color: black; }
+    /* CARDS */
+    .card { background: var(--card); border: 1px solid #30363d; border-radius: 12px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: transform 0.2s; }
+    .card:hover { transform: translateY(-5px); border-color: var(--primary); }
+    .card h3 { color: var(--secondary); margin-top: 0; display: flex; align-items: center; gap: 10px; font-size: 1.1rem; }
 
-    @media (max-width: 768px) { .grid-container { grid-template-columns: 1fr; } }
+    /* INPUTS */
+    .input-group { margin-bottom: 15px; }
+    label { display: block; font-size: 0.8rem; color: #8b949e; margin-bottom: 5px; }
+    input, select { width: 100%; background: #0d1117; border: 1px solid #30363d; color: white; padding: 10px; border-radius: 6px; box-sizing: border-box; outline: none; transition: 0.3s; }
+    input:focus { border-color: var(--primary); }
+
+    /* RESULTS */
+    .result-display { background: rgba(0, 211, 102, 0.1); border: 1px dashed var(--primary); padding: 15px; border-radius: 8px; text-align: center; font-size: 1.4rem; font-weight: bold; color: var(--primary); margin-top: 20px; }
+    .sub-result { font-size: 0.8rem; color: #8b949e; margin-top: 5px; }
+
+    /* CHART CONTAINER */
+    .chart-container { position: relative; height: 250px; width: 100%; }
+
+    /* INFO SECTION (FOR ADSENSE CONTENT) */
+    .info-section { max-width: 1400px; margin: 40px auto; background: var(--card); padding: 30px; border-radius: 12px; border-left: 5px solid var(--primary); }
+    .info-section h2 { color: white; font-size: 1.5rem; }
+    .info-section p { color: #8b949e; line-height: 1.6; }
+
+    @media (max-width: 600px) { .dashboard-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 
-  <header style="text-align: center; margin-bottom: 30px;">
-    <h1 style="color: var(--primary); letter-spacing: 3px;">JOE HUB KENYA</h1>
-    <p>Smart Tools for the Kenyan Digital Consumer</p>
+  <header>
+    <h1>JOE HUB <span>BIASHARA</span></h1>
+    <div class="subtitle">SME Profit Calculator & Transaction Manager for Kenyans</div>
   </header>
 
-  <div class="grid-container">
+  <div class="dashboard-grid">
     
     <div class="card">
-      <h2>Data Usage Estimator</h2>
-      <p style="font-size: 0.8rem; opacity: 0.7;">Plan your bundles before you buy. Enter hours per day:</p>
-      
-      <div class="calc-row">
-        <span>TikTok / Instagram (Video)</span>
-        <input type="number" id="social" value="1" oninput="calcData()">
+      <h3>📈 Profit Forecaster</h3>
+      <div class="input-group">
+        <label>Buying Price (Cost of Goods)</label>
+        <input type="number" id="buyPrice" placeholder="e.g. 1500" oninput="calculateProfit()">
       </div>
-      <div class="calc-row">
-        <span>YouTube (High Quality)</span>
-        <input type="number" id="yt" value="0" oninput="calcData()">
+      <div class="input-group">
+        <label>Selling Price</label>
+        <input type="number" id="sellPrice" placeholder="e.g. 2500" oninput="calculateProfit()">
       </div>
-      <div class="calc-row">
-        <span>Web Browsing / WhatsApp</span>
-        <input type="number" id="web" value="2" oninput="calcData()">
+      <div class="input-group">
+        <label>Overheads (Transport/Rent)</label>
+        <input type="number" id="costs" value="0" oninput="calculateProfit()">
       </div>
-      
-      <div class="result-box" id="dataResult">
-        Daily Estimate: 650 MB
-      </div>
-      <p style="font-size: 0.7rem; margin-top: 10px; text-align: center; color: #888;">*Estimates based on average 2026 Kenyan network speeds.</p>
+      <div class="result-display" id="profitResult">KES 0.00</div>
+      <div class="sub-result" id="marginResult">Margin: 0%</div>
     </div>
 
     <div class="card">
-      <h2>Essential USSD Codes</h2>
-      <table>
-        <tr><th>Service</th><th>Code</th></tr>
-        <tr><td>Stop All Subscriptions</td><td>*456*9*5#</td></tr>
-        <tr><td>Check Data Balance</td><td>*544#</td></tr>
-        <tr><td>Airtel Data Manager</td><td>*100#</td></tr>
-        <tr><td>MPESA Reversal</td><td>Text to 456</td></tr>
-        <tr><td>CRB Status Check</td><td>*433#</td></tr>
-      </table>
-    </div>
-
-    <div class="card">
-      <h2>Lite Resources (Save Data)</h2>
-      <div class="mini-dash">
-        <a href="https://en.m.wikipedia.org" target="v" class="dash-link"><span>Wikipedia Lite</span> <span>➜</span></a>
-        <a href="https://m.facebook.com" target="v" class="dash-link"><span>Facebook Lite</span> <span>➜</span></a>
-        <a href="https://m.ebc.com" target="v" class="dash-link"><span>News Lite</span> <span>➜</span></a>
-        <a href="https://lite.cnn.com" target="v" class="dash-link"><span>CNN Text-Only</span> <span>➜</span></a>
+      <h3>📊 Visual Breakdown</h3>
+      <div class="chart-container">
+        <canvas id="profitChart"></canvas>
       </div>
     </div>
 
     <div class="card">
-      <h2>Digital Skills Section</h2>
-      <p>Learn how to reduce data consumption on your smartphone:</p>
-      <ul style="font-size: 0.85rem; color: #b0b8c1;">
-        <li>Disable Auto-update in Play Store</li>
-        <li>Set YouTube to 360p for mobile viewing</li>
-        <li>Use "Data Saver" mode in Chrome Settings</li>
-        <li>Turn off WhatsApp Auto-Download for media</li>
-      </ul>
+      <h3>💸 Quick Fee Check</h3>
+      <p style="font-size: 0.8rem; color: #8b949e; margin-bottom: 15px;">Estimate sending charges instantly.</p>
+      <div class="input-group">
+        <label>Amount to Send (KES)</label>
+        <input type="number" id="sendAmount" placeholder="e.g. 1000" oninput="calcFees()">
+      </div>
+      <div class="input-group">
+        <label>Transaction Type</label>
+        <select id="transType" onchange="calcFees()">
+          <option value="send">Send to Registered User</option>
+          <option value="withdraw">Withdraw at Agent</option>
+          <option value="paybill">Paybill</option>
+        </select>
+      </div>
+      <div class="result-display" style="border-color: var(--secondary); color: var(--secondary);" id="feeResult">Fee: KES 0</div>
     </div>
 
   </div>
 
-  <div style="max-width: 1200px; margin: 20px auto; height: 400px; background: #000; border-radius: 12px; overflow: hidden;">
-    <iframe name="v" src="about:blank" style="width: 100%; height: 100%; border: none;"></iframe>
+  <div class="info-section">
+    <h2>Why Digital Financial Literacy Matters in Kenya</h2>
+    <p>
+      Running a "side hustle" in Nairobi or Mombasa requires more than just stock; it requires precision. 
+      Many small business owners underestimate their overhead costs—transport (fare), airtime, and transaction fees—which eats into their final profit.
+      <br><br>
+      <strong>How to use this Dashboard:</strong>
+      This tool is designed to eliminate the guesswork. By inputting your "Buying Price" and "Hidden Costs," the system generates your actual Net Profit and visualizes it in real-time. 
+      Understanding your margins is the first step to scaling from a hawker to a wholesaler. Use the Fee Checker to ensure you always have enough float in your mobile money wallet before initiating a transaction.
+    </p>
   </div>
 
   <script>
-    function calcData() {
-        const social = document.getElementById('social').value * 500; // 500MB per hour
-        const yt = document.getElementById('yt').value * 700;     // 700MB per hour
-        const web = document.getElementById('web').value * 50;      // 50MB per hour
-        
-        const total = social + yt + web;
-        const display = total >= 1000 ? (total/1000).toFixed(2) + " GB" : total + " MB";
-        
-        document.getElementById('dataResult').textContent = "Daily Estimate: " + display;
+    // --- 1. SETUP CHART ---
+    const ctx = document.getElementById('profitChart').getContext('2d');
+    let myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Cost', 'Expenses', 'Profit'],
+            datasets: [{
+                data: [1, 1, 1], // Placeholder
+                backgroundColor: ['#30363d', '#FFD700', '#00D366'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'right', labels: { color: 'white' } } }
+        }
+    });
+
+    // --- 2. PROFIT LOGIC ---
+    function calculateProfit() {
+        const buy = parseFloat(document.getElementById('buyPrice').value) || 0;
+        const sell = parseFloat(document.getElementById('sellPrice').value) || 0;
+        const costs = parseFloat(document.getElementById('costs').value) || 0;
+
+        const profit = sell - (buy + costs);
+        const margin = sell > 0 ? ((profit / sell) * 100).toFixed(1) : 0;
+
+        // Update Text
+        const pDisplay = document.getElementById('profitResult');
+        pDisplay.innerText = "KES " + profit.toLocaleString();
+        pDisplay.style.color = profit >= 0 ? "#00D366" : "#ff4444";
+        document.getElementById('marginResult').innerText = "Margin: " + margin + "%";
+
+        // Update Chart
+        myChart.data.datasets[0].data = [buy, costs, profit > 0 ? profit : 0];
+        myChart.update();
+    }
+
+    // --- 3. FEE ESTIMATOR LOGIC (Simplified Estimates) ---
+    function calcFees() {
+        const amt = parseFloat(document.getElementById('sendAmount').value) || 0;
+        const type = document.getElementById('transType').value;
+        let fee = 0;
+
+        // Rough estimates based on standard tiers (Modify as needed)
+        if (type === 'send') {
+            if (amt <= 100) fee = 0;
+            else if (amt <= 500) fee = 7;
+            else if (amt <= 1000) fee = 13;
+            else if (amt <= 1500) fee = 23;
+            else if (amt <= 2500) fee = 33;
+            else fee = 55; // Simplified cap
+        } else if (type === 'withdraw') {
+             if (amt <= 100) fee = 10;
+            else if (amt <= 500) fee = 29;
+            else if (amt <= 1000) fee = 29;
+            else if (amt <= 2500) fee = 29;
+            else fee = 52;
+        }
+
+        document.getElementById('feeResult').innerText = "Est. Fee: KES " + fee;
     }
   </script>
 </body>
