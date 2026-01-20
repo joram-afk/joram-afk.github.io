@@ -6,41 +6,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2285%22>💸</text></svg>">
-  <title>JOE HUB | Kenyan Biashara Toolkit</title>
+  <title>JOE HUB | SME Toolkit</title>
   <style>
     :root { --primary: #00D366; --secondary: #FFD700; --bg: #090c10; --card: #161b22; --text: #f0f6fc; }
     body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; box-sizing: border-box; }
 
-    /* LAYOUT */
-    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto; }
-    
     header { text-align: center; margin-bottom: 40px; border-bottom: 1px solid #333; padding-bottom: 20px; }
     h1 { margin: 0; font-weight: 900; letter-spacing: 1px; color: white; }
     h1 span { color: var(--primary); }
     .subtitle { color: #8b949e; font-size: 0.9rem; margin-top: 5px; }
 
-    /* CARDS */
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto; }
     .card { background: var(--card); border: 1px solid #30363d; border-radius: 12px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: transform 0.2s; }
-    .card:hover { transform: translateY(-5px); border-color: var(--primary); }
     .card h3 { color: var(--secondary); margin-top: 0; display: flex; align-items: center; gap: 10px; font-size: 1.1rem; }
 
-    /* INPUTS */
     .input-group { margin-bottom: 15px; }
     label { display: block; font-size: 0.8rem; color: #8b949e; margin-bottom: 5px; }
     input, select { width: 100%; background: #0d1117; border: 1px solid #30363d; color: white; padding: 10px; border-radius: 6px; box-sizing: border-box; outline: none; transition: 0.3s; }
     input:focus { border-color: var(--primary); }
 
-    /* RESULTS */
     .result-display { background: rgba(0, 211, 102, 0.1); border: 1px dashed var(--primary); padding: 15px; border-radius: 8px; text-align: center; font-size: 1.4rem; font-weight: bold; color: var(--primary); margin-top: 20px; }
-    .sub-result { font-size: 0.8rem; color: #8b949e; margin-top: 5px; }
-
-    /* CHART CONTAINER */
-    .chart-container { position: relative; height: 250px; width: 100%; }
-
-    /* INFO SECTION (FOR ADSENSE CONTENT) */
-    .info-section { max-width: 1400px; margin: 40px auto; background: var(--card); padding: 30px; border-radius: 12px; border-left: 5px solid var(--primary); }
-    .info-section h2 { color: white; font-size: 1.5rem; }
-    .info-section p { color: #8b949e; line-height: 1.6; }
+    .summary-box { background: #0d1117; padding: 15px; border-radius: 8px; margin-top: 10px; border-left: 4px solid var(--secondary); }
+    .summary-item { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; }
+    
+    .chart-section { max-width: 1400px; margin: 40px auto; background: var(--card); padding: 30px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; }
+    .chart-container { position: relative; height: 350px; width: 100%; max-width: 600px; }
 
     @media (max-width: 600px) { .dashboard-grid { grid-template-columns: 1fr; } }
   </style>
@@ -49,7 +39,7 @@
 
   <header>
     <h1>JOE HUB <span>BIASHARA</span></h1>
-    <div class="subtitle">SME Profit Calculator & Transaction Manager for Kenyans</div>
+    <div class="subtitle">SME Profit Calculator & Tax Manager (2026 Edition)</div>
   </header>
 
   <div class="dashboard-grid">
@@ -57,7 +47,7 @@
     <div class="card">
       <h3>📈 Profit Forecaster</h3>
       <div class="input-group">
-        <label>Buying Price (Cost of Goods)</label>
+        <label>Buying Price (Stock Cost)</label>
         <input type="number" id="buyPrice" placeholder="e.g. 1500" oninput="calculateProfit()">
       </div>
       <div class="input-group">
@@ -68,22 +58,25 @@
         <label>Overheads (Transport/Rent)</label>
         <input type="number" id="costs" value="0" oninput="calculateProfit()">
       </div>
-      <div class="result-display" id="profitResult">KES 0.00</div>
-      <div class="sub-result" id="marginResult">Margin: 0%</div>
+      <div class="result-display" id="profitResult">Net: KES 0.00</div>
     </div>
 
     <div class="card">
-      <h3>📊 Visual Breakdown</h3>
-      <div class="chart-container">
-        <canvas id="profitChart"></canvas>
+      <h3>📊 Business Summary</h3>
+      <div class="summary-box">
+        <div class="summary-item"><span>Gross Margin:</span> <strong id="marginResult">0%</strong></div>
+        <div class="summary-item"><span>Net Profit:</span> <strong id="netKesResult">KES 0.00</strong></div>
+        <div class="summary-item"><span>Total Expenses:</span> <strong id="totalExpResult">KES 0.00</strong></div>
       </div>
+      <p style="font-size: 0.75rem; color: #8b949e; margin-top: 15px;">
+        *Calculated based on Net Profit after all overheads.
+      </p>
     </div>
 
     <div class="card">
-      <h3>💸 Quick Fee Check</h3>
-      <p style="font-size: 0.8rem; color: #8b949e; margin-bottom: 15px;">Estimate sending charges instantly.</p>
+      <h3>💸 Fee & Tax Checker</h3>
       <div class="input-group">
-        <label>Amount to Send (KES)</label>
+        <label>Transaction Amount (KES)</label>
         <input type="number" id="sendAmount" placeholder="e.g. 1000" oninput="calcFees()">
       </div>
       <div class="input-group">
@@ -91,43 +84,46 @@
         <select id="transType" onchange="calcFees()">
           <option value="send">Send to Registered User</option>
           <option value="withdraw">Withdraw at Agent</option>
-          <option value="paybill">Paybill</option>
+          <option value="paybill">Paybill / Buy Goods</option>
         </select>
       </div>
-      <div class="result-display" style="border-color: var(--secondary); color: var(--secondary);" id="feeResult">Fee: KES 0</div>
+      <div class="result-display" style="border-color: var(--secondary); color: var(--secondary);" id="feeResult">Total: KES 0</div>
+      <div class="summary-box" style="border-left-color: #ff4444;">
+        <div class="summary-item"><span>Provider Fee:</span> <span id="providerFee">KES 0</span></div>
+        <div class="summary-item"><span>Govt Excise Tax (15%):</span> <span id="govtTax">KES 0</span></div>
+      </div>
     </div>
 
   </div>
 
-  <div class="info-section">
-    <h2>Why Digital Financial Literacy Matters in Kenya</h2>
-    <p>
-      Running a "side hustle" in Nairobi or Mombasa requires more than just stock; it requires precision. 
-      Many small business owners underestimate their overhead costs—transport (fare), airtime, and transaction fees—which eats into their final profit.
-      <br><br>
-      <strong>How to use this Dashboard:</strong>
-      This tool is designed to eliminate the guesswork. By inputting your "Buying Price" and "Hidden Costs," the system generates your actual Net Profit and visualizes it in real-time. 
-      Understanding your margins is the first step to scaling from a hawker to a wholesaler. Use the Fee Checker to ensure you always have enough float in your mobile money wallet before initiating a transaction.
-    </p>
+  <div class="chart-section">
+    <h2 style="margin-bottom: 20px;">Profit vs Expenditure Visualization</h2>
+    <div class="chart-container">
+      <canvas id="profitChart"></canvas>
+    </div>
   </div>
 
   <script>
     // --- 1. SETUP CHART ---
     const ctx = document.getElementById('profitChart').getContext('2d');
     let myChart = new Chart(ctx, {
-        type: 'doughnut',
+        type: 'pie',
         data: {
-            labels: ['Cost', 'Expenses', 'Profit'],
+            labels: ['Stock Cost', 'Overheads', 'Pure Profit'],
             datasets: [{
-                data: [1, 1, 1], // Placeholder
+                data: [1, 1, 1],
                 backgroundColor: ['#30363d', '#FFD700', '#00D366'],
-                borderWidth: 0
+                hoverOffset: 20,
+                borderWidth: 2,
+                borderColor: '#161b22'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'right', labels: { color: 'white' } } }
+            plugins: { 
+                legend: { position: 'bottom', labels: { color: 'white', padding: 20 } } 
+            }
         }
     });
 
@@ -135,45 +131,51 @@
     function calculateProfit() {
         const buy = parseFloat(document.getElementById('buyPrice').value) || 0;
         const sell = parseFloat(document.getElementById('sellPrice').value) || 0;
-        const costs = parseFloat(document.getElementById('costs').value) || 0;
+        const overheads = parseFloat(document.getElementById('costs').value) || 0;
 
-        const profit = sell - (buy + costs);
-        const margin = sell > 0 ? ((profit / sell) * 100).toFixed(1) : 0;
+        const netProfit = sell - (buy + overheads);
+        const margin = sell > 0 ? ((netProfit / sell) * 100).toFixed(1) : 0;
 
-        // Update Text
-        const pDisplay = document.getElementById('profitResult');
-        pDisplay.innerText = "KES " + profit.toLocaleString();
-        pDisplay.style.color = profit >= 0 ? "#00D366" : "#ff4444";
-        document.getElementById('marginResult').innerText = "Margin: " + margin + "%";
+        // Update Dashboard
+        document.getElementById('profitResult').innerText = "Net: KES " + netProfit.toLocaleString();
+        document.getElementById('profitResult').style.color = netProfit >= 0 ? "#00D366" : "#ff4444";
+        
+        document.getElementById('marginResult').innerText = margin + "%";
+        document.getElementById('netKesResult').innerText = "KES " + netProfit.toLocaleString();
+        document.getElementById('totalExpResult').innerText = "KES " + (buy + overheads).toLocaleString();
 
         // Update Chart
-        myChart.data.datasets[0].data = [buy, costs, profit > 0 ? profit : 0];
+        myChart.data.datasets[0].data = [buy, overheads, netProfit > 0 ? netProfit : 0];
         myChart.update();
     }
 
-    // --- 3. FEE ESTIMATOR LOGIC (Simplified Estimates) ---
+    // --- 3. FEE & TAX LOGIC (2026 UPDATED) ---
     function calcFees() {
         const amt = parseFloat(document.getElementById('sendAmount').value) || 0;
         const type = document.getElementById('transType').value;
-        let fee = 0;
+        let baseFee = 0;
 
-        // Rough estimates based on standard tiers (Modify as needed)
+        // Standard 2026 Tier Estimates
         if (type === 'send') {
-            if (amt <= 100) fee = 0;
-            else if (amt <= 500) fee = 7;
-            else if (amt <= 1000) fee = 13;
-            else if (amt <= 1500) fee = 23;
-            else if (amt <= 2500) fee = 33;
-            else fee = 55; // Simplified cap
+            if (amt <= 100) baseFee = 0;
+            else if (amt <= 500) baseFee = 6;
+            else if (amt <= 1000) baseFee = 12;
+            else if (amt <= 5000) baseFee = 25;
+            else baseFee = 50;
         } else if (type === 'withdraw') {
-             if (amt <= 100) fee = 10;
-            else if (amt <= 500) fee = 29;
-            else if (amt <= 1000) fee = 29;
-            else if (amt <= 2500) fee = 29;
-            else fee = 52;
+            if (amt <= 100) baseFee = 10;
+            else if (amt <= 500) baseFee = 27;
+            else if (amt <= 1000) baseFee = 28;
+            else baseFee = 52;
         }
 
-        document.getElementById('feeResult').innerText = "Est. Fee: KES " + fee;
+        // 15% Excise Duty on the Fee
+        const tax = baseFee * 0.15;
+        const total = baseFee + tax;
+
+        document.getElementById('providerFee').innerText = "KES " + baseFee.toFixed(2);
+        document.getElementById('govtTax').innerText = "KES " + tax.toFixed(2);
+        document.getElementById('feeResult').innerText = "Total: KES " + total.toFixed(2);
     }
   </script>
 </body>
