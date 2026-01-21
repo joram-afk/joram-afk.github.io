@@ -7,48 +7,41 @@
   
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JOE HUB | Business Manager</title>
+  <title>JOE HUB | All-in-One Business</title>
   <style>
     :root { --primary: #00D366; --secondary: #FFD700; --bg: #090c10; --card: #161b22; --text: #f0f6fc; --danger: #ff4444; --blue: #5865f2; }
     body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
 
-    /* --- HEADER & MENU --- */
+    /* HEADER & NAV */
     header { background: var(--card); padding: 15px 20px; display: flex; align-items: center; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }
     .menu-btn { font-size: 1.8rem; cursor: pointer; color: var(--primary); margin-right: 20px; background: none; border: none; }
     h1 { margin: 0; font-size: 1.2rem; font-weight: 700; }
     h1 span { color: var(--primary); }
 
-    /* SIDE MENU DRAWER */
     .side-menu { height: 100%; width: 0; position: fixed; z-index: 200; top: 0; left: 0; background-color: #0d1117; overflow-x: hidden; transition: 0.3s; box-shadow: 2px 0 10px rgba(0,0,0,0.5); padding-top: 60px; }
     .side-menu a { padding: 15px 30px; text-decoration: none; font-size: 1.1rem; color: #8b949e; display: block; border-bottom: 1px solid #21262d; }
     .side-menu a:hover, .side-menu a.active { color: var(--text); background: rgba(0, 211, 102, 0.1); border-left: 4px solid var(--primary); }
     .close-btn { position: absolute; top: 10px; right: 20px; font-size: 2rem; color: #8b949e; background: none; border: none; cursor: pointer; }
 
-    /* --- SCREENS --- */
+    /* SCREENS */
     .app-screen { padding: 20px; display: none; animation: fadeIn 0.4s; max-width: 800px; margin: 0 auto; }
     .active-screen { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* --- FORM & CARDS --- */
-    .card { background: var(--card); border: 1px solid #30363d; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-    
+    /* CARDS & FORMS */
+    .card { background: var(--card); border: 1px solid #30363d; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
     label { font-size: 0.85rem; color: #8b949e; margin-bottom: 5px; display: block; }
-    input, select { background: #0d1117; border: 1px solid #30363d; color: white; padding: 12px; border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 15px; font-size: 1rem; }
-    input:focus { border-color: var(--primary); outline: none; }
-
-    /* SYSTEMATIC GRID FOR INPUTS */
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
-    /* BUTTONS */
-    .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-    .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.2s; }
-    .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+    input, select { background: #0d1117; border: 1px solid #30363d; color: white; padding: 12px; border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 15px; }
     
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    
+    /* BUTTONS */
+    .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.2s; margin-top: 5px; }
     .btn-add { background: var(--primary); color: white; }
     .btn-view { background: var(--blue); color: white; }
     .btn-pdf { background: var(--secondary); color: black; }
-    .btn-delete { background: rgba(255, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); padding: 5px 10px; border-radius: 5px; cursor: pointer; }
-    .btn-delete:hover { background: var(--danger); color: white; }
+    .btn-sell { background: var(--primary); color: white; padding: 5px 10px; font-size: 0.8rem; border-radius: 4px; }
+    .btn-delete { background: none; color: var(--danger); border: 1px solid var(--danger); padding: 5px 10px; font-size: 0.8rem; border-radius: 4px; }
 
     /* TABLE */
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
@@ -59,237 +52,245 @@
     .modal { display: none; position: fixed; z-index: 500; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); }
     .modal-content { background: var(--card); margin: 15% auto; padding: 25px; border: 1px solid var(--blue); border-radius: 15px; width: 90%; max-width: 400px; position: relative; }
     .summary-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #30363d; }
-    .summary-row strong { color: var(--text); }
   </style>
 </head>
 <body>
 
   <header>
     <button class="menu-btn" onclick="toggleMenu()">☰</button>
-    <h1>JOE HUB <span>APP</span></h1>
+    <h1>JOE HUB <span>BIASHARA</span></h1>
   </header>
 
   <div id="sideMenu" class="side-menu">
     <button class="close-btn" onclick="toggleMenu()">&times;</button>
-    <a href="#" onclick="showScreen('inventory', this)" class="active">📦 Inventory</a>
-    <a href="#" onclick="showScreen('analytics', this)">📊 Deep Analytics</a>
-    <a href="#" onclick="showScreen('tax', this)">💸 Tax Calculator</a>
-    <div style="position: absolute; bottom: 30px; width: 100%; text-align: center;">
-      <button onclick="refreshPage()" style="background: #30363d; color: #ff6666; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">Reset App</button>
-    </div>
+    <a href="#" onclick="showScreen('inventory', this)" class="active">📦 Stock Manager</a>
+    <a href="#" onclick="showScreen('salesLog', this)">🛒 Sales History</a>
+    <a href="#" onclick="showScreen('analytics', this)">📊 Analytics</a>
+    <a href="#" onclick="showScreen('tax', this)">💸 Fee Checker</a>
+    <div style="padding: 20px;"><button onclick="refreshPage()" class="btn btn-delete" style="width:100%">Reset All Data</button></div>
   </div>
 
   <div id="summaryModal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal()" style="font-size: 1.5rem; top: 15px; right: 15px;">&times;</span>
-      <h2 style="color: var(--blue); margin-top: 0;">Quick Summary</h2>
+      <h2 style="color: var(--blue); margin-top: 0;">Stock Summary</h2>
       <div id="modalStats"></div>
       <button class="btn btn-add" style="background: #30363d; margin-top: 15px;" onclick="closeModal()">Close</button>
     </div>
   </div>
 
   <div id="inventory" class="app-screen active-screen">
-    
     <div class="card">
       <h3 style="margin-top:0;">📝 Add New Stock</h3>
-      
       <label>Item Name</label>
       <input type="text" id="itemName" placeholder="e.g. Unga Bale">
       
       <div class="form-row">
-        <div>
-          <label>Quantity</label>
-          <input type="number" id="itemQty" placeholder="1">
-        </div>
-        <div>
-          <label>Buying Price (Per Item)</label>
-          <input type="number" id="itemCost" placeholder="KES">
-        </div>
+        <div><label>Quantity</label><input type="number" id="itemQty" value="1"></div>
+        <div><label>Buying Price (Per Item)</label><input type="number" id="itemCost"></div>
       </div>
-
-      <label>Selling Price (Per Item)</label>
-      <input type="number" id="itemSell" placeholder="KES">
-
-      <button class="btn btn-add" onclick="addItem()">+ Add to Inventory</button>
       
-      <div class="btn-group">
-        <button class="btn btn-view" onclick="openModal()">👁️ View Summary</button>
-        <button class="btn btn-pdf" onclick="downloadPDF()">📄 Download PDF</button>
+      <label>Selling Price (Per Item)</label>
+      <input type="number" id="itemSell">
+      
+      <button class="btn btn-add" onclick="addItem()">+ Add to Stock</button>
+      
+      <div class="form-row" style="margin-top:10px;">
+        <button class="btn btn-view" onclick="openModal()">👁️ View Totals</button>
+        <button class="btn btn-pdf" onclick="downloadPDF()">📄 Stock PDF</button>
       </div>
     </div>
 
-    <div class="card" style="padding: 15px;">
-      <h3 style="margin-top:0; border-bottom: 1px solid #333; padding-bottom: 10px;">📦 Current Stock</h3>
+    <div class="card">
+      <h3>📦 Items in Shop</h3>
       <table>
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Qty</th>
-            <th>Profit</th>
-            <th style="text-align: right;">Action</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Item</th><th>Qty</th><th>Action</th></tr></thead>
         <tbody id="inventoryBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="salesLog" class="app-screen">
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3>🛒 Sales Record</h3>
+        <button class="btn btn-pdf" style="width: auto; padding: 5px 15px;" onclick="downloadSalesPDF()">Export Log</button>
+      </div>
+      <table>
+        <thead><tr><th>Time</th><th>Item</th><th>Profit</th></tr></thead>
+        <tbody id="salesBody"></tbody>
       </table>
     </div>
   </div>
 
   <div id="analytics" class="app-screen">
     <div class="card">
-      <h3>Business Health</h3>
-      <div style="height: 250px;"><canvas id="profitChart"></canvas></div>
-    </div>
-    <div class="card">
-      <h3>Detailed Breakdown</h3>
-      <div class="summary-row"><span>Total Revenue:</span><strong id="statRevenue">KES 0</strong></div>
-      <div class="summary-row"><span>Total Cost:</span><strong id="statCost">KES 0</strong></div>
-      <div class="summary-row"><span>Net Profit:</span><strong style="color: var(--primary);" id="statProfit">KES 0</strong></div>
+      <h3>Realized Profits</h3>
+      <div style="height: 200px;"><canvas id="profitChart"></canvas></div>
+      <div class="summary-row" style="margin-top:20px;"><span>Items Sold Today:</span><strong id="statItemsSold">0</strong></div>
+      <div class="summary-row"><span>Total Net Profit:</span><strong style="color: var(--primary);" id="statProfit">KES 0</strong></div>
     </div>
   </div>
 
   <div id="tax" class="app-screen">
     <div class="card">
-      <h3>Fee Check</h3>
+      <h3>Kenya Fee Calculator</h3>
       <input type="number" id="sendAmount" placeholder="Amount (KES)" oninput="calcFees()">
       <select id="transType" onchange="calcFees()">
         <option value="send">Send Money</option>
-        <option value="withdraw">Agent Withdrawal</option>
+        <option value="withdraw">Withdraw at Agent</option>
       </select>
-      <div style="background: rgba(255, 215, 0, 0.1); border: 1px dashed var(--secondary); padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px;">
-        <span style="color: #8b949e;">Total Fee</span>
-        <strong style="display:block; color: var(--secondary); font-size: 1.5rem;" id="totalFee">KES 0</strong>
+      <div style="text-align: center; background: rgba(0,211,102,0.1); padding: 20px; border-radius: 8px;">
+        <span style="color: #8b949e;">Total Cost (Incl. 15% Tax)</span>
+        <h2 id="totalFee" style="color: var(--secondary); margin: 10px 0;">KES 0</h2>
       </div>
     </div>
   </div>
 
   <script>
-    // --- STATE ---
-    let inventory = JSON.parse(localStorage.getItem('joeHubData')) || [];
-    let isMenuOpen = false;
+    let inventory = JSON.parse(localStorage.getItem('joeInventory')) || [];
+    let sales = JSON.parse(localStorage.getItem('joeSales')) || [];
 
     // --- NAVIGATION ---
-    function toggleMenu() {
-        const menu = document.getElementById('sideMenu');
-        isMenuOpen = !isMenuOpen;
-        menu.style.width = isMenuOpen ? "250px" : "0";
+    function toggleMenu() { 
+      const menu = document.getElementById('sideMenu');
+      menu.style.width = menu.style.width === "250px" ? "0" : "250px"; 
     }
 
-    function showScreen(screenId, el) {
-        document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active-screen'));
-        document.getElementById(screenId).classList.add('active-screen');
-        document.querySelectorAll('.side-menu a').forEach(a => a.classList.remove('active'));
-        if(el) el.classList.add('active');
-        toggleMenu();
-        if(screenId === 'analytics') updateAnalytics();
+    function showScreen(id, el) {
+      document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active-screen'));
+      document.getElementById(id).classList.add('active-screen');
+      document.querySelectorAll('.side-menu a').forEach(a => a.classList.remove('active'));
+      if(el) el.classList.add('active');
+      toggleMenu();
+      if(id === 'analytics') updateAnalytics();
     }
 
     // --- INVENTORY LOGIC ---
     function addItem() {
-        const name = document.getElementById('itemName').value;
-        const qty = parseInt(document.getElementById('itemQty').value) || 0;
-        const buy = parseFloat(document.getElementById('itemCost').value) || 0;
-        const sell = parseFloat(document.getElementById('itemSell').value) || 0;
+      const name = document.getElementById('itemName').value;
+      const qty = parseInt(document.getElementById('itemQty').value) || 0;
+      const buy = parseFloat(document.getElementById('itemCost').value) || 0;
+      const sell = parseFloat(document.getElementById('itemSell').value) || 0;
 
-        if(!name || qty <= 0) return alert("Please fill in valid details!");
+      if(!name || qty <= 0) return alert("Fill all fields correctly!");
+      inventory.push({ name, qty, buy, sell });
+      saveAndRefresh();
+      ['itemName','itemCost','itemSell'].forEach(id => document.getElementById(id).value = '');
+    }
 
-        inventory.push({ name, qty, buy, sell, totalProfit: (sell - buy) * qty });
-        saveData();
-        renderInventory();
+    function sellItem(index) {
+      const item = inventory[index];
+      const qtyToSell = prompt(`Units sold for ${item.name}? (Stock: ${item.qty})`, 1);
+      
+      if(qtyToSell > 0 && qtyToSell <= item.qty) {
+        const profit = (item.sell - item.buy) * qtyToSell;
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         
-        ['itemName', 'itemCost', 'itemSell', 'itemQty'].forEach(id => document.getElementById(id).value = '');
+        sales.push({ name: item.name, qty: qtyToSell, profit, time });
+        item.qty -= qtyToSell;
+        
+        if(item.qty === 0) inventory.splice(index, 1);
+        
+        saveAndRefresh();
+        alert("Sale Recorded! Profit updated.");
+      } else {
+        alert("Invalid Quantity");
+      }
     }
 
     function deleteItem(index) {
-        if(confirm("Are you sure you want to delete this item?")) {
-            inventory.splice(index, 1);
-            saveData();
-            renderInventory();
-        }
+      if(confirm("Delete this stock item?")) { inventory.splice(index, 1); saveAndRefresh(); }
     }
 
-    function saveData() {
-        localStorage.setItem('joeHubData', JSON.stringify(inventory));
-        updateAnalytics();
+    function saveAndRefresh() {
+      localStorage.setItem('joeInventory', JSON.stringify(inventory));
+      localStorage.setItem('joeSales', JSON.stringify(sales));
+      renderInventory();
+      renderSales();
     }
 
     function renderInventory() {
-        const body = document.getElementById('inventoryBody');
-        if(inventory.length === 0) {
-            body.innerHTML = "<tr><td colspan='4' style='text-align:center; color:#8b949e; padding:20px;'>No items yet. Add one above!</td></tr>";
-            return;
-        }
-        body.innerHTML = inventory.map((item, index) => `
-            <tr>
-                <td><strong>${item.name}</strong></td>
-                <td>${item.qty}</td>
-                <td style="color: var(--primary)">${item.totalProfit.toLocaleString()}</td>
-                <td style="text-align: right;"><button class="btn-delete" onclick="deleteItem(${index})">Delete</button></td>
-            </tr>
-        `).join('');
+      document.getElementById('inventoryBody').innerHTML = inventory.map((item, i) => `
+        <tr>
+          <td><strong>${item.name}</strong></td>
+          <td>${item.qty}</td>
+          <td>
+            <button class="btn-sell" onclick="sellItem(${i})">Sell</button>
+            <button class="btn-delete" onclick="deleteItem(${i})" style="margin-left:5px;">X</button>
+          </td>
+        </tr>`).join('');
     }
 
-    // --- MODAL & ANALYTICS ---
+    function renderSales() {
+      document.getElementById('salesBody').innerHTML = sales.slice().reverse().map(s => `
+        <tr>
+          <td>${s.time}</td>
+          <td>${s.name} (x${s.qty})</td>
+          <td style="color:var(--primary)">${s.profit.toLocaleString()}</td>
+        </tr>`).join('');
+    }
+
+    // --- SUMMARY MODAL ---
     function openModal() {
-        let profit = 0, cost = 0, revenue = 0;
-        inventory.forEach(i => { profit += i.totalProfit; cost += (i.buy * i.qty); revenue += (i.sell * i.qty); });
-        
-        const margin = revenue > 0 ? ((profit / revenue) * 100).toFixed(1) : 0;
-
-        document.getElementById('modalStats').innerHTML = `
-            <div class="summary-row"><span>Stock Value:</span><strong>KES ${cost.toLocaleString()}</strong></div>
-            <div class="summary-row"><span>Exp. Revenue:</span><strong>KES ${revenue.toLocaleString()}</strong></div>
-            <div class="summary-row"><span>Margin:</span><strong style="color: var(--secondary)">${margin}%</strong></div>
-            <div class="summary-row" style="border:none; margin-top:10px;">
-                <span>Total Profit:</span><strong style="color: var(--primary); font-size:1.2rem;">KES ${profit.toLocaleString()}</strong>
-            </div>
-        `;
-        document.getElementById('summaryModal').style.display = "block";
+      let cost = 0, rev = 0;
+      inventory.forEach(i => { cost += (i.buy * i.qty); rev += (i.sell * i.qty); });
+      document.getElementById('modalStats').innerHTML = `
+        <div class="summary-row"><span>Stock Value:</span><strong>KES ${cost.toLocaleString()}</strong></div>
+        <div class="summary-row"><span>Expected Sales:</span><strong>KES ${rev.toLocaleString()}</strong></div>
+        <div class="summary-row" style="border:none;"><span>Potential Profit:</span><strong style="color:var(--primary)">KES ${(rev-cost).toLocaleString()}</strong></div>
+      `;
+      document.getElementById('summaryModal').style.display = 'block';
     }
+    function closeModal() { document.getElementById('summaryModal').style.display = 'none'; }
 
-    function closeModal() { document.getElementById('summaryModal').style.display = "none"; }
-    
-    // Close modal on outside click
-    window.onclick = function(event) { if (event.target == document.getElementById('summaryModal')) closeModal(); }
-
+    // --- ANALYTICS ---
     function updateAnalytics() {
-        let profit = 0, cost = 0, revenue = 0;
-        inventory.forEach(i => { profit += i.totalProfit; cost += (i.buy * i.qty); revenue += (i.sell * i.qty); });
+      let totalP = 0, totalQ = 0;
+      sales.forEach(s => { totalP += s.profit; totalQ += parseInt(s.qty); });
+      document.getElementById('statProfit').innerText = `KES ${totalP.toLocaleString()}`;
+      document.getElementById('statItemsSold').innerText = totalQ;
 
-        document.getElementById('statRevenue').innerText = `KES ${revenue.toLocaleString()}`;
-        document.getElementById('statProfit').innerText = `KES ${profit.toLocaleString()}`;
-        document.getElementById('statCost').innerText = `KES ${cost.toLocaleString()}`;
-
-        const ctx = document.getElementById('profitChart').getContext('2d');
-        if(window.myChartInstance) window.myChartInstance.destroy();
-        window.myChartInstance = new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels: ['Cost', 'Profit'], datasets: [{ data: [cost, profit > 0 ? profit : 0], backgroundColor: ['#30363d', '#00D366'], borderWidth: 0 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: 'white' } } } }
-        });
+      const ctx = document.getElementById('profitChart').getContext('2d');
+      if(window.myChart) window.myChart.destroy();
+      window.myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: { labels: ['Realized Profit', 'Sales Count'], datasets: [{ data: [totalP, totalQ], backgroundColor: ['#00D366', '#5865f2'], borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
     }
 
-    // --- TAX & PDF ---
+    // --- TAX & UTILS ---
     function calcFees() {
-        const amt = parseFloat(document.getElementById('sendAmount').value) || 0;
-        const type = document.getElementById('transType').value;
-        let baseFee = (amt <= 100) ? 0 : (amt <= 1000) ? 12 : 25;
-        if(type === 'withdraw') baseFee = (amt <= 100) ? 10 : (amt <= 1000) ? 28 : 50;
-        
-        const total = baseFee + (baseFee * 0.15);
-        document.getElementById('totalFee').innerText = `KES ${total.toFixed(2)}`;
+      const amt = parseFloat(document.getElementById('sendAmount').value) || 0;
+      const type = document.getElementById('transType').value;
+      let fee = (amt <= 1000) ? 12 : 25;
+      if(type === 'withdraw') fee = (amt <= 1000) ? 28 : 50;
+      document.getElementById('totalFee').innerText = `KES ${(fee * 1.15).toFixed(2)}`;
     }
 
     function downloadPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("JOE HUB - STOCK REPORT", 14, 15);
-        doc.autoTable({ head: [['Item', 'Qty', 'Buy', 'Sell', 'Profit']], body: inventory.map(i => [i.name, i.qty, i.buy, i.sell, i.totalProfit]), startY: 25 });
-        doc.save("JoeHub_Report.pdf");
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("JOE HUB - CURRENT STOCK", 14, 15);
+      doc.autoTable({ head: [['Item', 'Qty', 'Buy', 'Sell']], body: inventory.map(i => [i.name, i.qty, i.buy, i.sell]) });
+      doc.save("Stock_Report.pdf");
     }
 
-    function refreshPage() { if(confirm("Clear all data?")) { localStorage.clear(); location.reload(); } }
+    function downloadSalesPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("JOE HUB - SALES HISTORY", 14, 15);
+      doc.autoTable({ head: [['Time', 'Item', 'Qty', 'Profit']], body: sales.map(s => [s.time, s.name, s.qty, s.profit]) });
+      doc.save("Sales_Log.pdf");
+    }
+
+    function refreshPage() { if(confirm("This clears ALL data. Continue?")) { localStorage.clear(); location.reload(); } }
+
+    window.onclick = function(e) { if(e.target == document.getElementById('summaryModal')) closeModal(); }
 
     renderInventory();
+    renderSales();
   </script>
 </body>
 </html>
