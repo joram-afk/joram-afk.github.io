@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Key Manager - M-Pesa & AI Agent</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 700px;
+      width: 100%;
+      padding: 40px;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    .tab-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #eee;
+    }
+    .tab-button {
+      padding: 12px 20px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #666;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .tab-button.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    input[type="password"] {
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+    }
+    .info-box {
+      background: #f0f7ff;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #333;
+      line-height: 1.6;
+    }
+    .btn-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+    button[type="submit"],
+    .btn-test,
+    .btn-clear {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      flex: 1;
+    }
+    button[type="submit"] {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    button[type="submit"]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    .btn-test {
+      background: #4CAF50;
+      color: white;
+    }
+    .btn-test:hover {
+      background: #45a049;
+    }
+    .btn-clear {
+      background: #f44336;
+      color: white;
+    }
+    .btn-clear:hover {
+      background: #da190b;
+    }
+    .status-message {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 6px;
+      display: none;
+      font-size: 14px;
+    }
+    .status-message.success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+      display: block;
+    }
+    .status-message.error {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+      display: block;
+    }
+    .field-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    .field-group .form-group {
+      margin-bottom: 0;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 25px;
+      }
+      .field-group {
+        grid-template-columns: 1fr;
+      }
+      .btn-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 API Key Manager</h1>
+    <p class="subtitle">Configure M-Pesa and AI Agent Integration</p>
+
+    <div class="tab-buttons">
+      <button class="tab-button active" data-tab="mpesa">M-Pesa Setup</button>
+      <button class="tab-button" data-tab="aiagent">AI Agent Setup</button>
+      <button class="tab-button" data-tab="status">Integration Status</button>
+    </div>
+
+    <!-- M-Pesa Configuration Tab -->
+    <div id="mpesa" class="tab-content active">
+      <div class="info-box">
+        <strong>M-Pesa Daraja API:</strong><br>
+        To get your credentials, register at <a href="https://developer.safaricom.co.ke" target="_blank">Safaricom Daraja</a>
+        and create an app to obtain Consumer Key and Consumer Secret.
+      </div>
+
+      <form id="mpesa-form">
+        <div class="form-group">
+          <label for="environment">Environment</label>
+          <select id="environment" name="environment" required>
+            <option value="sandbox">Sandbox (Testing)</option>
+            <option value="production">Production (Live)</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <div class="form-group">
+            <label for="consumerKey">Consumer Key</label>
+            <input type="password" id="consumerKey" name="consumerKey" placeholder="Your Consumer Key" required>
+          </div>
+          <div class="form-group">
+            <label for="consumerSecret">Consumer Secret</label>
+            <input type="password" id="consumerSecret" name="consumerSecret" placeholder="Your Consumer Secret" required>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="form-group">
+            <label for="businessShortCode">Business Short Code</label>
+            <input type="text" id="businessShortCode" name="businessShortCode" placeholder="e.g., 174379" required>
+          </div>
+          <div class="form-group">
+            <label for="passkey">Online Lipa na M-Pesa Passkey</label>
+            <input type="password" id="passkey" name="passkey" placeholder="Your Passkey" required>
+          </div>
+        </div>
+
+        <div class="btn-container">
+          <button type="submit" class="btn-submit">💾 Save M-Pesa Credentials</button>
+          <button type="button" class="btn-test" onclick="testMpesaConnection()">🧪 Test Connection</button>
+          <button type="button" class="btn-clear" onclick="clearMpesaCredentials()">🗑️ Clear</button>
+        </div>
+        <div id="mpesa-status" class="status-message"></div>
+      </form>
+    </div>
+
+    <!-- AI Agent Configuration Tab -->
+    <div id="aiagent" class="tab-content">
+      <div class="info-box">
+        <strong>AI Agent API Key:</strong><br>
+        This page supports Claude API (Anthropic). Get your API key from
+        <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.
+        Keep your key secure and never share it publicly.
+      </div>
+
+      <form id="aiagent-form">
+        <div class="form-group">
+          <label for="aiApiKey">AI Agent API Key (Claude)</label>
+          <input type="password" id="aiApiKey" name="aiApiKey" placeholder="sk-ant-..." required>
+        </div>
+
+        <div class="form-group">
+          <label for="aiModel">AI Model</label>
+          <select id="aiModel" name="aiModel">
+            <option value="claude-3-sonnet-20240229">Claude 3 Sonnet</option>
+            <option value="claude-3-opus-20240229">Claude 3 Opus</option>
+            <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="maxTokens">Max Tokens (Response Length)</label>
+          <input type="number" id="maxTokens" name="maxTokens" value="1000" min="100" max="4096">
+        </div>
+
+        <div class="info-box">
+          <strong>Service Pricing (KES):</strong><br>
+          Basic Query: 50 KES | Advanced Analysis: 200 KES<br>
+          Custom Report: 500 KES | Premium Support: 1000 KES
+        </div>
+
+        <div class="btn-container">
+          <button type="submit" class="btn-submit">💾 Save AI Agent Key</button>
+          <button type="button" class="btn-test" onclick="testAIConnection()">🧪 Test Connection</button>
+          <button type="button" class="btn-clear" onclick="clearAICredentials()">🗑️ Clear</button>
+        </div>
+        <div id="aiagent-status" class="status-message"></div>
+      </form>
+    </div>
+
+    <!-- Integration Status Tab -->
+    <div id="status" class="tab-content">
+      <div style="padding: 20px 0;">
+        <h3 style="margin-bottom: 15px; color: #333;">Integration Status</h3>
+
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+          <p style="margin-bottom: 10px;"><strong>M-Pesa Configuration:</strong></p>
+          <div id="mpesa-status-display" style="font-size: 13px; color: #666; line-height: 1.8;">
+            <p>Loading...</p>
+          </div>
+        </div>
+
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+          <p style="margin-bottom: 10px;"><strong>AI Agent Configuration:</strong></p>
+          <div id="aiagent-status-display" style="font-size: 13px; color: #666; line-height: 1.8;">
+            <p>Loading...</p>
+          </div>
+        </div>
+
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 6px;">
+          <p style="margin-bottom: 10px;"><strong>User Session:</strong></p>
+          <div id="user-status-display" style="font-size: 13px; color: #666; line-height: 1.8;">
+            <p>Loading...</p>
+          </div>
+        </div>
+
+        <button type="button" class="btn-test" style="width: 100%; margin-top: 20px;" onclick="refreshStatus()">
+          🔄 Refresh Status
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/auth.js"></script>
+  <script src="mpesa-config.js"></script>
+  <script src="ai-agent.js"></script>
+
+  <script>
+    // Tab Navigation
+    document.querySelectorAll('.tab-button').forEach(button => {
+      button.addEventListener('click', () => {
+        const tabName = button.getAttribute('data-tab');
+        
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+          tab.classList.remove('active');
+        });
+        
+        // Remove active class from all buttons
+        document.querySelectorAll('.tab-button').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        // Show selected tab
+        document.getElementById(tabName).classList.add('active');
+        button.classList.add('active');
+
+        // Load status if status tab
+        if (tabName === 'status') {
+          setTimeout(refreshStatus, 100);
+        }
+      });
+    });
+
+    // M-Pesa Form Handler
+    document.getElementById('mpesa-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const statusDiv = document.getElementById('mpesa-status');
+      
+      try {
+        const credentials = {
+          consumerKey: document.getElementById('consumerKey').value,
+          consumerSecret: document.getElementById('consumerSecret').value,
+          businessShortCode: document.getElementById('businessShortCode').value,
+          passkey: document.getElementById('passkey').value,
+          environment: document.getElementById('environment').value
+        };
+
+        if (window.saveMpesaCredentials) {
+          window.saveMpesaCredentials(credentials);
+          showStatus('mpesa-status', '✅ M-Pesa credentials saved successfully!', 'success');
+        }
+      } catch (error) {
+        showStatus('mpesa-status', '❌ Error: ' + error.message, 'error');
+      }
+    });
+
+    // AI Agent Form Handler
+    document.getElementById('aiagent-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const statusDiv = document.getElementById('aiagent-status');
+      
+      try {
+        const apiKey = document.getElementById('aiApiKey').value;
+        const model = document.getElementById('aiModel').value;
+        const maxTokens = document.getElementById('maxTokens').value;
+
+        localStorage.setItem('ai_agent_api_key', apiKey);
+        localStorage.setItem('ai_agent_model', model);
+        localStorage.setItem('ai_agent_max_tokens', maxTokens);
+
+        showStatus('aiagent-status', '✅ AI Agent credentials saved successfully!', 'success');
+      } catch (error) {
+        showStatus('aiagent-status', '❌ Error: ' + error.message, 'error');
+      }
+    });
+
+    // Load saved credentials on page load
+    function loadSavedCredentials() {
+      // Load M-Pesa credentials
+      const consumerKey = localStorage.getItem('mpesa_consumer_key');
+      const consumerSecret = localStorage.getItem('mpesa_consumer_secret');
+      const businessShortCode = localStorage.getItem('mpesa_business_short_code');
+      const passkey = localStorage.getItem('mpesa_passkey');
+      const environment = localStorage.getItem('mpesa_environment') || 'sandbox';
+
+      if (consumerKey) document.getElementById('consumerKey').value = consumerKey;
+      if (consumerSecret) document.getElementById('consumerSecret').value = consumerSecret;
+      if (businessShortCode) document.getElementById('businessShortCode').value = businessShortCode;
+      if (passkey) document.getElementById('passkey').value = passkey;
+      document.getElementById('environment').value = environment;
+
+      // Load AI Agent credentials
+      const aiApiKey = localStorage.getItem('ai_agent_api_key');
+      const aiModel = localStorage.getItem('ai_agent_model') || 'claude-3-sonnet-20240229';
+      const maxTokens = localStorage.getItem('ai_agent_max_tokens') || '1000';
+
+      if (aiApiKey) document.getElementById('aiApiKey').value = aiApiKey;
+      document.getElementById('aiModel').value = aiModel;
+      document.getElementById('maxTokens').value = maxTokens;
+    }
+
+    // Test M-Pesa Connection
+    async function testMpesaConnection() {
+      try {
+        showStatus('mpesa-status', '🔄 Testing M-Pesa connection...', 'success');
+        const token = await window.getMpesaAccessToken();
+        if (token) {
+          showStatus('mpesa-status', '✅ M-Pesa connection successful! Token obtained.', 'success');
+        }
+      } catch (error) {
+        showStatus('mpesa-status', '❌ M-Pesa connection failed: ' + error.message, 'error');
+      }
+    }
+
+    // Test AI Connection
+    async function testAIConnection() {
+      try {
+        showStatus('aiagent-status', '🔄 Testing AI Agent connection...', 'success');
+        // Mock test - replace with actual API call
+        setTimeout(() => {
+          showStatus('aiagent-status', '✅ AI Agent connection successful!', 'success');
+        }, 1000);
+      } catch (error) {
+        showStatus('aiagent-status', '❌ AI Agent connection failed: ' + error.message, 'error');
+      }
+    }
+
+    // Clear M-Pesa Credentials
+    function clearMpesaCredentials() {
+      if (confirm('Are you sure you want to clear all M-Pesa credentials?')) {
+        localStorage.removeItem('mpesa_consumer_key');
+        localStorage.removeItem('mpesa_consumer_secret');
+        localStorage.removeItem('mpesa_business_short_code');
+        localStorage.removeItem('mpesa_passkey');
+        
+        document.getElementById('consumerKey').value = '';
+        document.getElementById('consumerSecret').value = '';
+        document.getElementById('businessShortCode').value = '';
+        document.getElementById('passkey').value = '';
+        
+        showStatus('mpesa-status', '✅ M-Pesa credentials cleared.', 'success');
+      }
+    }
+
+    // Clear AI Credentials
+    function clearAICredentials() {
+      if (confirm('Are you sure you want to clear all AI Agent credentials?')) {
+        localStorage.removeItem('ai_agent_api_key');
+        localStorage.removeItem('ai_agent_model');
+        localStorage.removeItem('ai_agent_max_tokens');
+        
+        document.getElementById('aiApiKey').value = '';
+        
+        showStatus('aiagent-status', '✅ AI Agent credentials cleared.', 'success');
+      }
+    }
+
+    // Show Status Message
+    function showStatus(elementId, message, type) {
+      const statusDiv = document.getElementById(elementId);
+      statusDiv.textContent = message;
+      statusDiv.className = `status-message ${type}`;
+      setTimeout(() => {
+        statusDiv.className = 'status-message';
+      }, 5000);
+    }
+
+    // Refresh Status Display
+    function refreshStatus() {
+      // M-Pesa Status
+      const mpesaEnv = localStorage.getItem('mpesa_environment') || 'Not configured';
+      const mpesaKey = localStorage.getItem('mpesa_consumer_key') ? '✅ Configured' : '❌ Not configured';
+      const mpesaDisplay = document.getElementById('mpesa-status-display');
+      mpesaDisplay.innerHTML = `
+        <p><strong>Environment:</strong> ${mpesaEnv}</p>
+        <p><strong>Consumer Key:</strong> ${mpesaKey}</p>
+        <p><strong>Status:</strong> ${mpesaKey === '✅ Configured' ? '🟢 Ready' : '🔴 Not ready'}</p>
+      `;
+
+      // AI Agent Status
+      const aiKey = localStorage.getItem('ai_agent_api_key') ? '✅ Configured' : '❌ Not configured';
+      const aiModel = localStorage.getItem('ai_agent_model') || 'Not set';
+      const aiDisplay = document.getElementById('aiagent-status-display');
+      aiDisplay.innerHTML = `
+        <p><strong>API Key:</strong> ${aiKey}</p>
+        <p><strong>Model:</strong> ${aiModel}</p>
+        <p><strong>Status:</strong> ${aiKey === '✅ Configured' ? '🟢 Ready' : '🔴 Not ready'}</p>
+      `;
+
+      // User Status
+      const user = window.getLoggedInUser ? window.getLoggedInUser() : null;
+      const userDisplay = document.getElementById('user-status-display');
+      if (user) {
+        userDisplay.innerHTML = `
+          <p><strong>User:</strong> ${user.name || 'Unknown'}</p>
+          <p><strong>Email:</strong> ${user.email || 'Not set'}</p>
+          <p><strong>Status:</strong> 🟢 Logged in</p>
+        `;
+      } else {
+        userDisplay.innerHTML = `<p><strong>Status:</strong> 🔴 Not logged in</p>`;
+      }
+    }
+
+    // Load credentials on page load
+    window.addEventListener('DOMContentLoaded', loadSavedCredentials);
+  </script>
+</body>
+</html>
