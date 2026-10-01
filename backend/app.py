@@ -1,147 +1,229 @@
-"""FastAPI service for M-Pesa payments and paid AI requests.
-
-Secrets are loaded from environment variables. This module intentionally contains
-no credentials and is not intended to be hosted by GitHub Pages.
-"""
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
 import os
-import sqlite3
 from datetime import datetime, timezone
-from pathlib import Path
-from typing import Any
 
 import httpx
 from anthropic import AsyncAnthropic
-from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import JWTError, jwt
 
-load_dotenv()
+from backend.config import settings
+from backend.database import get_connection
+from backend.models import (
+    AIRequestPayload,
+    AIResponse,
+    AuthToken,
+    LoginPayload,
+    PaymentStatusResponse,
+    RegisterPayload,
+    StkPushPayload,
+    TokenResponse,
+    UserOut,
+    utc_now,
+)
 
-ENVIRONMENT = os.getenv("MPESA_ENVIRONMENT", "sandbox").lower()
-MPESA_BASE = "https://api.safaricom.co.ke" if ENVIRONMENT == "production" else "https://sandbox.safaricom.co.ke"
-DB_PATH = Path(os.getenv("DATABASE_PATH", "./backend/data/app.db"))
-DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-PRICES = {"basicQuery": 50, "advancedAnalysis": 200, "customReport": 500, "premiumSupport": 1000}
+app = FastAPI(title=settings.APP_NAME, version=settings.APP_VERSION)
 
-app = FastAPI(title="M-Pesa AI Agent API", version="1.0.0")
-origins = [x.strip() for x in os.getenv("ALLOWED_ORIGINS", "").split(",") if x.strip()]
-app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["GET", "POST"], allow_headers=["*"])
+security = HTTPBearer(auto_error=False)
 
-
-def db() -> sqlite3.Connection:
-    connection = sqlite3.connect(DB_PATH)
-    connection.row_factory = sqlite3.Row
-    connection.execute("""CREATE TABLE IF NOT EXISTS payments (
-        checkout_request_id TEXT PRIMARY KEY,
-        merchant_request_id TEXT,
-        amount INTEGER NOT NULL,
-        phone_number TEXT NOT NULL,
-        status TEXT NOT NULL,
-        receipt TEXT,
-        raw_callback TEXT,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL
-    )""")
-    return connection
-
-
-class StkRequest(BaseModel):
-    phone_number: str = Field(pattern=r"^254[17]\\d{8}$")
-    amount: int = Field(ge=1, le=150000)
-    service_type: str = "basicQuery"
+if settings.ALLOWED_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.ALLOWED_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
-class AIRequest(BaseModel):
-    checkout_request_id: str
-    query: str = Field(min_length=1, max_length=12000)
-    service_type: str = "basicQuery"
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode("utf-8")).hexdigest()
 
 
-async def access_token() -> str:
-    key = os.getenv("MPESA_CONSUMER_KEY")
-    secret = os.getenv("MPESA_CONSUMER_SECRET")
-    if not key or not secret:
-        raise HTTPException(503, "M-Pesa credentials are not configured")
-    credentials = base64.b64encode(f"{key}:{secret}".encode()).decode()
-    async with httpx.AsyncClient(timeout=20) as client:
-        response = await client.get(f"{MPESA_BASE}/oauth/v1/generate?grant_type=client_credentials", headers={"Authorization": f"Basic {credentials}"})
+def create_token(user_id: int, email: str) -> str:
+    payload = {"sub": str(user_id), "email": email, "exp": datetime.now(timezone.utc).timestamp() + 86400}
+    return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+
+
+def verify_token(credentials: HTTPAuthorizationCredentials | None) -> int:
+    if not credentials:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Bearer token required")
+    try:
+        payload = jwt.decode(credentials.credentials, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+        user_id = int(payload.get("sub"))
+        return user_id
+    except JWTError as exc:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid token") from exc
+
+
+def token_for_user(user_id: int, email: str) -> str:
+    return create_token(user_id, email)
+
+
+async def get_mpesa_token() -> str:
+    if not settings.MPESA_CONSUMER_KEY or not settings.MPESA_CONSUMER_SECRET:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "M-Pesa credentials are not configured")
+    auth = base64.b64encode(f"{settings.MPESA_CONSUMER_KEY}:{settings.MPESA_CONSUMER_SECRET}".encode()).decode()
+    async with httpx.AsyncClient(timeout=25) as client:
+        response = await client.get(
+            f"{settings.MPESA_BASE_URL}/oauth/v1/generate?grant_type=client_credentials",
+            headers={"Authorization": f"Basic {auth}"},
+        )
     if response.is_error:
-        raise HTTPException(502, "Unable to authenticate with M-Pesa")
-    return response.json()["access_token"]
+        raise HTTPException(response.status_code, "M-Pesa authentication failed")
+    data = response.json()
+    return str(data["access_token"])
 
 
-def stk_password(timestamp: str) -> str:
-    shortcode = os.environ["MPESA_SHORTCODE"]
-    passkey = os.environ["MPESA_PASSKEY"]
-    return base64.b64encode(f"{shortcode}{passkey}{timestamp}".encode()).decode()
+def mpesa_password(timestamp: str) -> str:
+    if not settings.MPESA_SHORTCODE or not settings.MPESA_PASSKEY:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "M-Pesa passkey or shortcode is missing")
+    return base64.b64encode(f"{settings.MPESA_SHORTCODE}{settings.MPESA_PASSKEY}{timestamp}".encode()).decode()
 
 
 @app.get("/health")
 async def health() -> dict[str, str]:
-    return {"status": "ok", "environment": ENVIRONMENT}
+    return {"status": "ok", "service": settings.APP_NAME}
+
+
+@app.post("/api/auth/register", response_model=AuthToken)
+async def register(payload: RegisterPayload) -> AuthToken:
+    with get_connection() as conn:
+        existing = conn.execute("SELECT id FROM users WHERE email = ?", (payload.email,)).fetchone()
+        if existing:
+            raise HTTPException(status.HTTP_409_CONFLICT, "User already exists")
+        now = utc_now()
+        password_hash = hash_password(payload.password)
+        cursor = conn.execute(
+            "INSERT INTO users (email, password_hash, full_name, phone_number, created_at) VALUES (?, ?, ?, ?, ?)",
+            (str(payload.email), password_hash, payload.full_name, payload.phone_number, now),
+        )
+        user_id = cursor.lastrowid
+        user = conn.execute(
+            "SELECT id, email, full_name, phone_number, created_at FROM users WHERE id = ?",
+            (user_id,),
+        ).fetchone()
+    access_token = create_token(user["id"], user["email"])
+    return AuthToken(access_token=access_token, user=UserOut(**dict(user)))
+
+
+@app.post("/api/auth/login", response_model=AuthToken)
+async def login(payload: LoginPayload) -> AuthToken:
+    password_hash = hash_password(payload.password)
+    with get_connection() as conn:
+        user = conn.execute(
+            "SELECT id, email, full_name, phone_number, created_at FROM users WHERE email = ? AND password_hash = ?",
+            (str(payload.email), password_hash),
+        ).fetchone()
+    if user is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid email or password")
+    access_token = create_token(user["id"], user["email"])
+    return AuthToken(access_token=access_token, user=UserOut(**dict(user)))
 
 
 @app.post("/api/payments/stk-push")
-async def start_payment(payload: StkRequest) -> dict[str, Any]:
-    if payload.service_type not in PRICES or payload.amount != PRICES[payload.service_type]:
-        raise HTTPException(400, "Invalid amount or service type")
-    shortcode = os.getenv("MPESA_SHORTCODE")
-    callback = os.getenv("MPESA_CALLBACK_URL")
-    if not shortcode or not os.getenv("MPESA_PASSKEY") or not callback:
-        raise HTTPException(503, "M-Pesa payment configuration is incomplete")
+async def stk_push(payload: StkPushPayload, credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict[str, str | int]:
+    user_id = verify_token(credentials)
+    amount = int(payload.amount)
+    if amount != settings.SERVICE_PRICING.get(payload.service_type, 0):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Amount does not match service price")
+    if not settings.MPESA_CALLBACK_URL:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Callback URL is not configured")
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
-    body = {"BusinessShortCode": shortcode, "Password": stk_password(timestamp), "Timestamp": timestamp, "TransactionType": "CustomerPayBillOnline", "Amount": payload.amount, "PartyA": payload.phone_number, "PartyB": shortcode, "PhoneNumber": payload.phone_number, "CallBackURL": callback, "AccountReference": f"AI-{payload.service_type}", "TransactionDesc": "AI Agent service"}
+    body = {
+        "BusinessShortCode": settings.MPESA_SHORTCODE,
+        "Password": mpesa_password(timestamp),
+        "Timestamp": timestamp,
+        "TransactionType": "CustomerPayBillOnline",
+        "Amount": amount,
+        "PartyA": payload.phone_number,
+        "PartyB": settings.MPESA_SHORTCODE,
+        "PhoneNumber": payload.phone_number,
+        "CallBackURL": settings.MPESA_CALLBACK_URL,
+        "AccountReference": f"AI-{payload.service_type}",
+        "TransactionDesc": "AI Agent service",
+    }
     async with httpx.AsyncClient(timeout=30) as client:
-        response = await client.post(f"{MPESA_BASE}/mpesa/stkpush/v1/processrequest", json=body, headers={"Authorization": f"Bearer {await access_token()}"})
-    data = response.json()
-    if response.is_error or data.get("ResponseCode") != "0":
-        raise HTTPException(502, data.get("errorMessage", "STK Push failed"))
-    now = datetime.now(timezone.utc).isoformat()
-    with db() as connection:
-        connection.execute("INSERT INTO payments VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (data["CheckoutRequestID"], data.get("MerchantRequestID"), payload.amount, payload.phone_number, "pending", None, None, now, now))
-    return {"checkout_request_id": data["CheckoutRequestID"], "customer_message": data.get("CustomerMessage", "Check your phone")}
+        response = await client.post(
+            f"{settings.MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest",
+            json=body,
+            headers={"Authorization": f"Bearer {await get_mpesa_token()}"},
+        )
+    result = response.json()
+    if response.is_error or result.get("ResponseCode") != "0":
+        raise HTTPException(status.HTTP_502_BAD_GATEWAY, result.get("errorMessage", "STK Push failed"))
+    checkout_request_id = result["CheckoutRequestID"]
+    merchant_request_id = result.get("MerchantRequestID")
+    now = utc_now()
+    with get_connection() as conn:
+        conn.execute(
+            "INSERT INTO payments (checkout_request_id, merchant_request_id, user_id, amount, phone_number, service_type, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (checkout_request_id, merchant_request_id, user_id, amount, payload.phone_number, payload.service_type, "pending", now, now),
+        )
+    return {"checkout_request_id": checkout_request_id, "customer_message": result.get("CustomerMessage", "Check your phone")}
 
 
 @app.post("/api/mpesa/callback")
 async def mpesa_callback(request: Request) -> dict[str, str]:
-    body = await request.json()
-    callback = body.get("Body", {}).get("stkCallback", {})
-    checkout_id = callback.get("CheckoutRequestID")
+    payload = await request.json()
+    callback_data = payload.get("Body", {}).get("stkCallback", {})
+    checkout_id = callback_data.get("CheckoutRequestID")
     if not checkout_id:
         return {"ResultCode": "0", "ResultDesc": "Accepted"}
-    status = "paid" if callback.get("ResultCode") == 0 else "failed"
-    items = callback.get("CallbackMetadata", {}).get("Item", [])
-    receipt = next((item.get("Value") for item in items if item.get("Name") == "MpesaReceiptNumber"), None)
-    now = datetime.now(timezone.utc).isoformat()
-    with db() as connection:
-        connection.execute("UPDATE payments SET status=?, receipt=?, raw_callback=?, updated_at=? WHERE checkout_request_id=?", (status, receipt, json.dumps(body), now, checkout_id))
+    status_value = "paid" if callback_data.get("ResultCode") == 0 else "failed"
+    receipt = None
+    items = callback_data.get("CallbackMetadata", {}).get("Item", [])
+    for item in items:
+        if item.get("Name") == "MpesaReceiptNumber":
+            receipt = item.get("Value")
+            break
+    now = utc_now()
+    with get_connection() as conn:
+        conn.execute(
+            "UPDATE payments SET status = ?, receipt = ?, raw_callback = ?, updated_at = ? WHERE checkout_request_id = ?",
+            (status_value, receipt, json.dumps(payload), now, checkout_id),
+        )
     return {"ResultCode": "0", "ResultDesc": "Accepted"}
 
 
-@app.get("/api/payments/{checkout_request_id}")
-async def payment_status(checkout_request_id: str) -> dict[str, Any]:
-    with db() as connection:
-        row = connection.execute("SELECT checkout_request_id, amount, status, receipt, updated_at FROM payments WHERE checkout_request_id=?", (checkout_request_id,)).fetchone()
-    if not row:
-        raise HTTPException(404, "Payment not found")
-    return dict(row)
+@app.get("/api/payments/{checkout_request_id}", response_model=PaymentStatusResponse)
+async def payment_status(checkout_request_id: str) -> PaymentStatusResponse:
+    with get_connection() as conn:
+        row = conn.execute(
+            "SELECT checkout_request_id, merchant_request_id, user_id, amount, phone_number, service_type, status, receipt, created_at, updated_at FROM payments WHERE checkout_request_id = ?",
+            (checkout_request_id,),
+        ).fetchone()
+    if row is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Payment not found")
+    return PaymentStatusResponse(**dict(row))
 
 
-@app.post("/api/ai/query")
-async def paid_ai_query(payload: AIRequest) -> dict[str, Any]:
-    with db() as connection:
-        payment = connection.execute("SELECT amount, status FROM payments WHERE checkout_request_id=?", (payload.checkout_request_id,)).fetchone()
-    if not payment or payment["status"] != "paid":
-        raise HTTPException(402, "A confirmed M-Pesa payment is required")
-    api_key = os.getenv("ANTHROPIC_API_KEY")
-    if not api_key:
-        raise HTTPException(503, "AI provider is not configured")
-    client = AsyncAnthropic(api_key=api_key)
-    message = await client.messages.create(model=os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-20240620"), max_tokens=1000, system=f"You are a helpful {payload.service_type} assistant.", messages=[{"role": "user", "content": payload.query}])
+@app.post("/api/ai/invoke", response_model=AIResponse)
+async def invoke_ai(payload: AIRequestPayload, credentials: HTTPAuthorizationCredentials = Depends(security)) -> AIResponse:
+    verify_token(credentials)
+    with get_connection() as conn:
+        payment = conn.execute(
+            "SELECT amount, status FROM payments WHERE checkout_request_id = ?",
+            (payload.checkout_request_id,),
+        ).fetchone()
+    if payment is None or payment["status"] != "paid":
+        raise HTTPException(status.HTTP_402_PAYMENT_REQUIRED, "A confirmed M-Pesa payment is required")
+    if payload.service_type not in settings.SERVICE_PRICING:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Unsupported service type")
+    client = AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+    if not settings.ANTHROPIC_API_KEY:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Anthropic API key is not configured")
+    message = await client.messages.create(
+        model=settings.ANTHROPIC_MODEL,
+        max_tokens=1024,
+        system=f"You are a helpful {payload.service_type} assistant.",
+        messages=[{"role": "user", "content": payload.query}],
+    )
     answer = "".join(block.text for block in message.content if getattr(block, "type", None) == "text")
-    return {"answer": answer, "amount": payment["amount"], "checkout_request_id": payload.checkout_request_id}
+    return AIResponse(answer=answer, amount=int(payment["amount"]), checkout_request_id=payload.checkout_request_id)
