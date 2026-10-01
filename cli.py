@@ -4,6 +4,7 @@ import asyncio
 
 import click
 
+from ai_payment_agent import AIPaymentAgent
 from ai import get_user_transactions, invoke_ai
 from auth import get_user_by_email, login_user, register_user
 from database import init_database
@@ -12,7 +13,7 @@ from payment import get_payment_status, initiate_stk_push
 
 @click.group()
 def cli() -> None:
-    """M-Pesa AI Agent CLI."""
+    """M-Pesa AI Agent CLI with autonomous payments."""
     init_database()
 
 
@@ -110,6 +111,30 @@ def invoke(user_id: int, checkout_id: str, prompt: str, service: str) -> None:
             click.echo(f"\nAnswer:\n{transaction.answer}")
         except Exception as e:
             click.echo(f"✗ Query failed: {str(e)}", err=True)
+    
+    asyncio.run(run())
+
+
+@ai.command()
+@click.option("--user-id", type=int, required=True, help="User ID")
+@click.option("--prompt", prompt=True, help="Your request")
+@click.option("--service", type=click.Choice(["basicQuery", "advancedAnalysis", "customReport", "premiumSupport"]), default="basicQuery", help="Service type")
+def autopay(user_id: int, prompt: str, service: str) -> None:
+    """Let AI agent autonomously handle payment and query."""
+    async def run() -> None:
+        try:
+            agent = AIPaymentAgent()
+            result = await agent.analyze_and_pay(user_id, prompt, service)
+            
+            if result["success"]:
+                click.echo(f"✓ AI Agent Payment Executed")
+                click.echo(f"  Payment ID: {result['payment_id']}")
+                click.echo(f"  Cost: {result['cost']} KES")
+                click.echo(f"\n✓ AI Response:\n{result['response']}")
+            else:
+                click.echo(f"✗ AI Payment Failed: {result['error']}", err=True)
+        except Exception as e:
+            click.echo(f"✗ Error: {str(e)}", err=True)
     
     asyncio.run(run())
 
