@@ -63,7 +63,7 @@ python -m cli transactions history --email user@example.com
 
 ## Pricing
 
-- Basic Query: 50 KES
+- Basic Query: 500 KES
 - Advanced Analysis: 200 KES
 - Custom Report: 500 KES
 - Premium Support: 1000 KES
