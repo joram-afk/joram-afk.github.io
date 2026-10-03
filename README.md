@@ -28,7 +28,7 @@ DATABASE_PATH=./data/app.db
 ### Register a new user
 
 ```bash
-python -m cli auth register --email user@example.com --password password123 --name "John Doe" --phone 254712345678
+python -m cli auth register --email user@example.com --password password123 --name "John Doel" --phone 254712345678
 ```
 
 ### Login
