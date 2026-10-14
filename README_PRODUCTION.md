@@ -2,6 +2,12 @@
 
 A secure, multi-language command-line tool for AI-powered queries with M-Pesa payments.
 
+## Spotify Profile Card
+
+<a href="https://data-card-for-spotify.herokuapp.com/card?user_id=31pdu5r3jy35rwqg3dvi37yqhjde">
+  <img src="https://data-card-for-spotify.herokuapp.com/api/card?user_id=31pdu5r3jy35rwqg3dvi37yqhjde" alt="Data Card for Spotify">
+</a>
+
 ## Architecture
 
 ```
@@ -253,3 +259,4 @@ For issues or questions:
 1. Check the troubleshooting section
 2. Review M-Pesa Daraja docs: https://developer.safaricom.co.ke/docs
 3. Check Anthropic Claude docs: https://docs.anthropic.com/claude/reference
+
